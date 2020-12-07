@@ -4,7 +4,9 @@ __node cli app for running Fighting Fantasy monster battles__
 
 I found a copy of [The Citadel of Chaos](https://en.wikipedia.org/wiki/The_Citadel_of_Chaos) in our local [Little Free Library](https://littlefreelibrary.org/) box and took it home for my son.
 
-I used to find the monster battles a bit tedious so I made this app for him to run his battles on.
+I can remember, at his age, finding the monster battle process tedious, so I made this app.
+
+He has not yet used it tbh but that's not a reflection of my work.
 
 ## Features
 
