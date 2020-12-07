@@ -1,0 +1,22 @@
+# fighting-fantasy-fighter
+
+__node cli app for running Fighting Fantasy monster battles__
+
+I found a copy of [The Citadel of Chaos](https://en.wikipedia.org/wiki/The_Citadel_of_Chaos) in our local [Little Free Library](https://littlefreelibrary.org/) box and took it home for my son.
+
+I used to find the monster battles a bit tedious so I made this app for him to run his battles on.
+
+## Features
+
+* Optional automated character / monster stat rolls
+* Features ability to use Luck
+* Dwindling hearts display the current state of the battle
+* Flashing hearts indicate low health warning
+
+![Screengrab of the app](./fff-grab.gif)
+
+## Usage
+
+* `npm run install`
+* `node fighting-fantasy-fighter`
+* Fight!
