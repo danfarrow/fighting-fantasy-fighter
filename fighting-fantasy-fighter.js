@@ -18,7 +18,8 @@ const spacer2 = () => console.log( spacerStr2 );
 // Define heading & caption formatting
 const h1Format = clc.cyan.bold;
 const h2Format = clc.cyan;
-const h3Format = clc.magentaBright.italic;
+const h3Format = clc.cyan.bold;
+const h3BoldFormat = clc.magentaBright.bold;
 const format = clc.white;
 const captionFormat = clc.bgYellowBright.black;
 const captionLowFormat = clc.yellowBright;
@@ -29,10 +30,11 @@ const staminaWarningFormat = clc.redBright.blink;
 const h1 = (str) => console.log( h1Format( str ) );
 const h2 = (str) => console.log( h2Format( str ) );
 const h3 = (str) => console.log( h3Format( str ) );
-const h1Prompt = (str, fallback) => prompt( h1Format( `${str}: ` ), fallback );
-const h2Prompt = (str, fallback) => prompt( h2Format( `${str}: ` ), fallback );
-const h3Prompt = (str, fallback) => prompt( h3Format( `${str}: ` ), fallback );
-const doPrompt = (str, fallback) => prompt( format( `${str}: ` ), fallback );
+const h3Bold = (str) => console.log( h3BoldFormat( str ) );
+const h1Prompt = (str, fallback) => prompt( h1Format( `${str} : ` ), fallback );
+const h2Prompt = (str, fallback) => prompt( h2Format( `${str} : ` ), fallback );
+const h3Prompt = (str, fallback) => prompt( h3BoldFormat( `${str} : ` ), fallback );
+const doPrompt = (str, fallback) => prompt( format( `${str} : ` ), fallback );
 const caption = (str) => console.log( captionFormat( str ) );
 const captionLow = (str) => console.log( captionLowFormat( str ) );
 const captionBad = (str) => console.log( captionBadFormat( str ) );
@@ -87,16 +89,16 @@ const battle = ( mName, mSkill, mStamina ) => {
       spacer();
       showAttributes( mName, mSkill, mStamina, null );
 
-      spacer();
-      h3( `ROUND ${++round}` );
-      spacer2();
+      spacer1();
+      h1( `ROUND ${++round}` );
+      spacer1();
 
       // Calculate attack strengths
       const attackStrength = rollDice(2) + skill,
          mAttackStrength = rollDice(2) + mSkill,
          diff = attackStrength - mAttackStrength;
 
-      const esc = h3Prompt( `Press ENTER to fight or E to escape` );
+      const esc = h3Prompt( `Fight [ENTER] or Escape [E]` );
       spacer2();
 
       if( "e" === esc.toLowerCase() ){
@@ -118,7 +120,8 @@ const battle = ( mName, mSkill, mStamina ) => {
          let damage = 2;
 
          if( luck > 0 ){
-            const luckInput = h3Prompt( `Use luck to reduce injury? Y for yes, or ENTER to ignore` );
+            h3( `Test luck (${luck}) to reduce injury?` );
+            const luckInput = h3Prompt( `Yes [y] or No [ENTER]` );
             if( "y" === luckInput.toLowerCase() ) damage = testLuck() ? 1 : 3;
          }
 
@@ -140,7 +143,8 @@ const battle = ( mName, mSkill, mStamina ) => {
          let damage = 2;
 
          if( luck > 0 ){
-            const luckInput = h3Prompt( `Use luck to intensify injury? Y for yes, or ENTER to ignore` );
+            h3( `Test luck (${luck}) to reduce injury?` );
+            const luckInput = h3Prompt( `Yes [y] or No [ENTER]` );
             if( "y" === luckInput.toLowerCase() ) damage = testLuck() ? 4 : 1;
          }
 
@@ -156,12 +160,13 @@ const battle = ( mName, mSkill, mStamina ) => {
    }
 }
 
+// Intro sequence
 spacer();
-const name = h3Prompt( `Enter your name`, `Anonymous` );
+const name = h3Prompt( `What is your name adventurer?`, `Anonymous` );
 spacer1();
-h1( `Greetings ${name}!` );
+h1( `Greetings brave ${name}!` );
 spacer();
-h2( `Enter your attributes or press ENTER to randomise` );
+h2( `Input your attributes or [ENTER] to randomise` );
 spacer();
 
 let skill = parseInt( h3Prompt( `Skill (1 die + 6)`, rollDice() + 6 ) );
@@ -174,19 +179,23 @@ spacer();
 
 let luck = parseInt( h3Prompt( `Luck (1 dice + 6)`, rollDice() + 6 ) );
 captionLow( luck );
+
+spacer();
+h1( `You are ready to begin your adventure!` );
 spacer1();
 
+// Monster encounters loop
 while( true ){
 
-   const esc = h3Prompt( `Press ENTER to continue or Q to quit` );
+   const esc = h3Prompt( `Continue [ENTER] or quit [Q]` );
 
    if( "q" === esc.toLowerCase() ) {
       spacer(), caption( `Goodbye!` ), spacer();
       process.exit();
    }
 
-   spacer(), caption( `A monster is approaching!` ), spacer();
-   captionLow( `Enter monster attributes or press ENTER to randomise` );
+   spacer2(), caption( `A monster is approaching!` ), spacer();
+   captionLow( `Input monster attributes or [ENTER] to randomise` );
    spacer();
 
    const mName = h3Prompt( `Monster name`, 'Unknown monster' );
