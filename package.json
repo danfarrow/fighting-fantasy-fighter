@@ -1,0 +1,15 @@
+{
+  "name": "fighting-fantasy-fighter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fighting-fantasy-fighter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cli-color": "^2.0.0",
+    "prompt-sync": "^4.2.0"
+  }
+}
