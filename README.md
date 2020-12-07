@@ -19,4 +19,5 @@ I used to find the monster battles a bit tedious so I made this app for him to r
 
 * `npm run install`
 * `node fighting-fantasy-fighter`
+* Follow the prompts
 * Fight!
