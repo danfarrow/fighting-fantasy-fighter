@@ -27,6 +27,8 @@ const captionBadFormat = clc.bgRedBright.black;
 const captionGoodFormat = clc.bgGreenBright.black;
 const staminaFormat = clc.redBright;
 const staminaWarningFormat = clc.redBright.blink;
+const monsterStaminaFormat = clc.greenBright;
+const monsterStaminaWarningFormat = clc.greenBright.blink;
 const h1 = (str) => console.log( h1Format( str ) );
 const h2 = (str) => console.log( h2Format( str ) );
 const h3 = (str) => console.log( h3Format( str ) );
@@ -59,16 +61,23 @@ const testLuck = () => {
 /**
  * Report stamina with conditional warning
  */
-const reportStamina = ( st ) => {
-   const format = st > 2 ? staminaFormat : staminaWarningFormat;
+const reportStamina = ( st, isMonster = false ) => {
+   let format;
+
+   if( isMonster ){
+      format = st > 2 ? monsterStaminaFormat : monsterStaminaWarningFormat;
+   } else {
+      format = st > 2 ? staminaFormat : staminaWarningFormat;
+   }
+
    console.log( format( "♥ ".repeat(st) ) );
 }
 /**
  * Display player attributes
  */
-const showAttributes = ( n = name, sk = skill, st = stamina, lk = luck ) => {
+const showAttributes = ( n = name, sk = skill, st = stamina, lk = luck, isMonster = false ) => {
    h1( `${n} [ Skill ${sk}${ lk ? ` Luck ${lk}` : ``} ]` );
-   reportStamina( st );
+   reportStamina( st, isMonster );
 }
 
 /**
@@ -87,7 +96,7 @@ const battle = ( mName, mSkill, mStamina ) => {
       showAttributes();
 
       spacer();
-      showAttributes( mName, mSkill, mStamina, null );
+      showAttributes( mName, mSkill, mStamina, null, true );
 
       spacer1();
       h1( `ROUND ${++round}` );
