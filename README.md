@@ -15,6 +15,8 @@ He has not yet used it tbh but that's not a reflection of my work.
 * Dwindling hearts display the current state of the battle
 * Flashing hearts indicate low health warning
 
+[![asciicast](https://asciinema.org/a/vUImToy8ZcAMu6V0iNN5OPkT5.svg)](https://asciinema.org/a/vUImToy8ZcAMu6V0iNN5OPkT5)
+
 ![Screengrab of the app](./fff-grab.gif)
 
 ## Usage
