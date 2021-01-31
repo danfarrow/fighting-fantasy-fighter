@@ -52,10 +52,21 @@ const replaceLine = () => {
    process.stdout.write(clc.move.up(1));
    process.stdout.write(clc.erase.line);
 }
+
 /**
  * Roll n 6 sided dice
  */
-const rollDice = (n = 1) => Math.ceil(Math.random() * ( 6 * n ));
+const rollDice = (n = 1) => {
+   let total = 0;
+
+   while( n-- ) {
+      total += rollDie();
+   }
+
+   return total;
+}
+
+const rollDie = () => Math.ceil(Math.random() * 6 );
 
 /**
 * Test luck
