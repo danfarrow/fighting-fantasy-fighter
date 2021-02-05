@@ -17,13 +17,15 @@ export default class Player extends Character {
          ...this.state.attributes,
          luck: 0,
          magic: 0,
-         gold: 10,
+         gold: 10
+      }
 
-         // Store initial values of
-         // skill, stamina & luck
-         skillInit: 0,
-         stamiInit: 0,
-         luckInit: 0
+      // Store initial values of skill,
+      // stamina & luck to impose limits
+      const l = this.state.attributeLimits = {
+         skill: 0,
+         stamina: 0,
+         luck: 0
       }
 
       // Randomise attributes
@@ -32,9 +34,9 @@ export default class Player extends Character {
       const luckFunc = ()=> this.dice.roll(1) + 6;
       const magicFunc = ()=> this.dice.roll(2);
 
-      a.skill = a.skillInit = skillFunc();
-      a.stamina = a.stamInit = stamFunc();
-      a.luck = a.luckInit = luckFunc();
+      a.skill = l.skill = skillFunc();
+      a.stamina = l.stamina = stamFunc();
+      a.luck = l.luck = luckFunc();
       a.magic = magicFunc();
 
    }
@@ -45,16 +47,13 @@ export default class Player extends Character {
     */
    setAttr( attr, value ){
 
-      const a = this.state.attributes;
-      const initKey = `${attr}Init`;
+      const limits = this.state.attributeLimits;
 
-      if( !a[initKey] ) return super.setAttr( attr, value );
+      if( !limits[attr] ) return super.setAttr( attr, value );
 
-      const initValue = a[initKey];
-      const newValue = a[attr] + parseInt(value);
-      const willExceed = newValue > initValue;
-
-      if( !willExceed ) return super.setAttr( attr, value );
+      if( parseInt(value) <= limits[attr] ) {
+         return super.setAttr( attr, value );
+      }
 
       // Get user confirmation
       const accept = this.prompt(
@@ -65,8 +64,8 @@ export default class Player extends Character {
          return `Attribute change cancelled`;
       }
 
-      // Update limit
-      a[initKey] = newValue;
+      // Update attribute limit
+      limits[attr] = parseInt(value);
       return super.setAttr( attr, value );
    }
 
