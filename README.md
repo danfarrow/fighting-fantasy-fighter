@@ -2,6 +2,8 @@
 
 __node command line companion app for playing Fighting Fantasy books__
 
+### [Try it online here!](https://repl.it/@danfarrow/fighting-fantasy-fighter)
+
 After playing [The Citadel of Chaos](https://en.wikipedia.org/wiki/The_Citadel_of_Chaos) many times with my son I became slightly obsessed with the idea of making a cli app to help us manage our playthroughs.
 
 He has not yet used it tbh but that's not a reflection of my work! I’m waiting for a couple of new books to be delivered.
@@ -21,7 +23,6 @@ He has not yet used it tbh but that's not a reflection of my work! I’m waiting
 
 ![Screengrab of the app](./fff-grab.png)
 
-[Try it online here](https://repl.it/@danfarrow/fighting-fantasy-fighter)
 
 ## Usage
 
