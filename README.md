@@ -1,27 +1,39 @@
 # fighting-fantasy-fighter
 
-__node cli app for running Fighting Fantasy monster battles__
+__node command line companion app for playing Fighting Fantasy books__
 
-I found a copy of [The Citadel of Chaos](https://en.wikipedia.org/wiki/The_Citadel_of_Chaos) in our local [Little Free Library](https://littlefreelibrary.org/) box and took it home for my son.
+After playing [The Citadel of Chaos](https://en.wikipedia.org/wiki/The_Citadel_of_Chaos) many times with my son I became slightly obsessed with the idea of making a cli app to help us manage our playthroughs.
 
-I can remember, at his age, finding the monster battle process tedious, so I made this app.
-
-He has not yet used it tbh but that's not a reflection of my work.
+He has not yet used it tbh but that's not a reflection of my work! I’m waiting for a couple of new books to be delivered.
 
 ## Features
 
-* Optional automated character / monster stat rolls
-* Features ability to use Luck
-* Dwindling hearts display the current state of the battle
-* Flashing hearts indicate low health warning
+* Simple menu driven interface
+* Manage player attributes & inventory
+* Exciting ASCII dice graphics
+* Gripping creature battles with a running log of your conquests
+* Add / remove inventory items
+* Save multiple snapshots of current game state
+* Export / import entire game state to json
+* Requires a [Fighting Fantasy](https://www.fightingfantasy.com/) book
 
-[![asciicast](https://asciinema.org/a/vUImToy8ZcAMu6V0iNN5OPkT5.svg)](https://asciinema.org/a/vUImToy8ZcAMu6V0iNN5OPkT5)
+## Coming soon
 
-![Screengrab of the app](./fff-grab.gif)
+* Add / edit custom game rules
+* Simpler inventory management
+* Friendlier export interface
+* More thrillingness
+
+[![asciicast](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq.svg)](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq)
+
+![Screengrab of the app](./fff-grab.png)
 
 ## Usage
 
-* `npm run install`
-* `node fighting-fantasy-fighter`
-* Follow the prompts
-* Fight!
+* Requires `node` & `npm`
+* `npm run install` to install dependencies
+* `npm link` to create a global link
+* `fff` to run
+* Choose menu items by typing the corresponding number
+
+Note: I've only used this on Ubuntu Linux. If you try it on another system please let me know what happens!
