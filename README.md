@@ -17,16 +17,11 @@ He has not yet used it tbh but that's not a reflection of my work! I’m waiting
 * Export / import entire game state to json
 * Requires a [Fighting Fantasy](https://www.fightingfantasy.com/) book
 
-## Coming soon
-
-* Add / edit custom game rules
-* Simpler inventory management
-* Friendlier export interface
-* More thrillingness
-
 [![asciicast](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq.svg)](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq)
 
 ![Screengrab of the app](./fff-grab.png)
+
+[Try it online here](https://repl.it/@danfarrow/fighting-fantasy-fighter)
 
 ## Usage
 
@@ -37,3 +32,10 @@ He has not yet used it tbh but that's not a reflection of my work! I’m waiting
 * Choose menu items by typing the corresponding number
 
 Note: I've only used this on Ubuntu Linux. If you try it on another system please let me know what happens!
+
+## Coming soon
+
+* Add / edit custom game rules
+* Simpler inventory management
+* Friendlier export interface
+* More thrillingness
