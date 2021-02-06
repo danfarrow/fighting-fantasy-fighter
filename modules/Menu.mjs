@@ -39,7 +39,7 @@ export default class Menu {
 
       return `Menu:\n\n`
          + config.reduce( reducer, `` )
-         + `Ⓠ  Quit`;
+         + `Ⓠ  Quit (with autosave)`;
    }
 
    /**

@@ -35,6 +35,9 @@ export default class Game {
          this.dice
       ];
 
+      // Try to load autosave
+      this.snapshots.import( 'autosave' );
+
       //Start input loop
       this.start();
    }
@@ -109,6 +112,7 @@ export default class Game {
     * Quit the app
     */
    quit(){
+      this._( this.snapshots.export( 'autosave' ) );
       console.log();
       process.exit();
    }
