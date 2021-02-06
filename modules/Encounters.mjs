@@ -259,7 +259,7 @@ export default class Encounters extends AbstractModule {
          )
       }
 
-      if( this.useLuckConfig ){
+      if( this.state.useLuckConfig ){
          opts.push(
             {
                title: this.state.useLuckConfig.title,

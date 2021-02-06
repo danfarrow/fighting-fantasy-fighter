@@ -97,7 +97,7 @@ export default class Snapshots extends AbstractModule {
 
       for( const module of this.game.modules ){
          const modName = module.moduleName;
-         if( "Dice" === modName ) continue;
+         if( !module.state ) continue;
          if( skipSnapshots && module === this ) continue;
          out[modName] = JSON.parse( JSON.stringify( module.state ));
       }
