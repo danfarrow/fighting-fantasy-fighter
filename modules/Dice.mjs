@@ -8,6 +8,13 @@ import AbstractModule from "./AbstractModule.mjs";
 export default class Dice extends AbstractModule {
    constructor( game ){
       super( game );
+
+      // Dice module not exported
+      delete this.state;
+
+      // Was the last throw a double?
+      this.double = false;
+
       this.alwaysVisible = true;
       this.diceAscii = [
          [
@@ -60,26 +67,19 @@ export default class Dice extends AbstractModule {
       ]
    }
 
-   getMenuOpen(){
-      return [
-         ...super.getMenuOpen(),
-         {
-            title: "Roll 1 die",
-            action: ()=>`You rolled ${this.roll()}`
-         },
-         {
-            title: "Roll 2 dice",
-            action: ()=>`You rolled ${this.roll(2)}`
-         }
-      ]
-   }
-
-   roll(n = 1){
+   /**
+    * Roll n dice
+    */
+   roll( n = 1 ){
       const diceThrows = [];
+      this.double = false;
 
       while(n--){
          diceThrows.push(Math.ceil(Math.random() * 6))
       }
+
+      // Check for double
+      this.double = diceThrows[0] === diceThrows[1];
 
       this.status = this.getAscii(diceThrows);
       return diceThrows.reduce((t,i)=>t+=i);
