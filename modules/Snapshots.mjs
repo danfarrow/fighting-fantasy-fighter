@@ -149,7 +149,14 @@ export default class Snapshots extends AbstractModule {
     */
    import( filename ){
       const fullFilename = `${filename}.json`;
-      const json = this.fs.readFileSync( `./${fullFilename}`, 'utf8' );
+      const filePath = `./${fullFilename}`;
+
+      // Check if file exists
+      if ( !fs.existsSync(filePath) ) {
+         return `${fullFilename} not found`;
+      }
+
+      const json = this.fs.readFileSync( filePath, 'utf8' );
       this.restoreGameState(JSON.parse(json));
       return( `${fullFilename} imported` );
    }
