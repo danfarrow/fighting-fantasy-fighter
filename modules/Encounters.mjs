@@ -43,6 +43,11 @@ export default class Encounters extends AbstractModule {
       return `Encounter with ${oName} started`;
    }
 
+   /**
+    * Fight round
+    *
+    * @todo This is a bit monolithic
+    */
    attack(){
       const o = this.state.opponent;
       const oName = o.getName();
@@ -55,15 +60,23 @@ export default class Encounters extends AbstractModule {
       const oAttackStrength = this.dice.roll(2) + o.getAttr('skill');
       const pAttackStrength = this.dice.roll(2) + p.getAttr('skill');
 
+      let damage = 2;
+      let instantDeath = false;
+
+      // Check for double roll / instant death!
+      if( this.dice.double ){
+         instantDeath = true;
+         damage = o.getAttr('stamina');
+      }
+
       const diff = pAttackStrength - oAttackStrength;
       const out = [
          `Your attack strength: ${pAttackStrength}`,
          `${oName}’s attack strength: ${oAttackStrength}`
       ];
 
-      let damage = 2;
 
-      if( diff < 0 ){
+      if( diff < 0 && !instantDeath ){
 
          out.push( `You were wounded!` );
          p.setAttr('stamina', p.getAttr('stamina') - damage);
@@ -92,7 +105,7 @@ export default class Encounters extends AbstractModule {
             return( `You were killed by ${oName}!` );
          }
 
-      } else if( diff > 0 ){
+      } else if( diff > 0  || instantDeath ){
 
          out.push(`${o.getName()} wounded!`);
          o.setAttr('stamina', o.getAttr('stamina') - damage);
@@ -116,6 +129,11 @@ export default class Encounters extends AbstractModule {
             // Replace `[opponent] wounded!` message
             out.pop();
             out.push( `You killed ${oName}!` );
+
+            // Add instant death message
+            if( instantDeath ){
+               out.push( `INSTANT DEATH!` );
+            }
 
             // Update log
             const r = this.state.log.roundCount;
