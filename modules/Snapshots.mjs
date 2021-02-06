@@ -90,34 +90,6 @@ export default class Snapshots extends AbstractModule {
    }
 
    /**
-    * Export game state to disk
-    */
-   export( filename ){
-      const json = this.exportGameState();
-
-      // Write file to disk
-      return fs.writeFileSync(
-         `./${filename}.json`,
-         json,
-         'utf8',
-         (err)=>{
-            if (err){
-
-               return( `Error writing file: ${err}` );
-
-            } else {
-
-               // Autoclose menu item
-               this.close();
-
-               return( `File written` );
-
-            }
-         }
-      );
-   }
-
-   /**
     * Assemble object representing game state
     */
    getGameState(skipSnapshots = true){
@@ -155,26 +127,31 @@ export default class Snapshots extends AbstractModule {
    /**
     * Assemble JSON representing game state
     */
-   exportGameState(){
+   getGameStateJson(){
       const state = this.getGameState(false);
       return JSON.stringify( state );
+   }
+
+   /**
+    * Export game state to disk
+    */
+   export( filename ){
+      const json = this.getGameStateJson();
+      const fullFilename = `${filename}.json`;
+
+      // Write file to disk
+      fs.writeFileSync(`./${fullFilename}`, json, 'utf8');
+      return( `Game state saved as ${fullFilename}` );
    }
 
    /**
     * Import game state from disk
     */
    import( filename ){
-      this.fs.readFile(
-         `./${filename}.json`, 'utf8',
-         (err, json)=>{
-            if(err){
-               return( `Error reading file: ${err}` );
-            } else {
-               this.restoreGameState(JSON.parse(json));
-               return( `File loaded` );
-            }
-         }
-      );
+      const fullFilename = `${filename}.json`;
+      const json = this.fs.readFileSync( `./${fullFilename}`, 'utf8' );
+      this.restoreGameState(JSON.parse(json));
+      return( `${fullFilename} imported` );
    }
 
    /**
