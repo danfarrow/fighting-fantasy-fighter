@@ -2,6 +2,7 @@
 
 // https://www.npmjs.com/package/prompt-sync
 import Prompt from 'prompt-sync';
+import Game from './Game.mjs';
 
 /**
  * AbstractModule class
@@ -33,7 +34,9 @@ export default class AbstractModule {
     * Indented prompt
     */
    prompt(msg){
-      return this.promptObj( this.indent + msg + ` ܀ ` );
+      return this.promptObj(
+         Game.promptFormat( this.indent + msg + ` ܀ ` )
+      );
    }
 
 

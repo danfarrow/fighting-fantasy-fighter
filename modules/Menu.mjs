@@ -1,6 +1,8 @@
 "use strict";
 
+// https://www.npmjs.com/package/prompt-sync
 import Prompt from 'prompt-sync';
+import Game from './Game.mjs';
 
 /**
  * Menu manager
@@ -16,7 +18,9 @@ export default class Menu {
     * Indented prompt
     */
    prompt(msg){
-      return this.promptObj( this.game.indent + msg );
+      return this.promptObj(
+         Game.promptFormat( this.game.indent + msg )
+      );
    }
 
    /**
@@ -30,7 +34,7 @@ export default class Menu {
          out += `(${i}) ${opt.title}\n`;
 
       return config.reduce( reducer, `__Menu__\n` )
-         + `Ⓠ  Quit (with autosave)`;
+         + `${Game.indexFormat('Ⓠ')}  Quit (with autosave)`;
    }
 
    /**

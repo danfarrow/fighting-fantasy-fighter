@@ -16,9 +16,12 @@ import Encounters from "./Encounters.mjs"
 export default class Game {
 
    static colWidth = 60;
-   static headerFormat = clc.xterm(195).bgXterm(31);
+   static headerFormat = clc.xterm(116).bgXterm(31).bold;
    static dividerFormat = clc.blackBright;
-   static diceFormat = clc.xterm(230);
+   static diceFormat = clc.xterm(190);
+   static promptFormat = clc.xterm(45).italic;
+   static statusFormat = clc.xterm(190).bold;
+   static indexFormat = clc.xterm(45);
 
    constructor(){
 
@@ -97,12 +100,11 @@ export default class Game {
       process.stdout.write(clc.reset);// Clear screen
       this._();
       this._();
-      this.__();
       this._( this.renderModules() );
       this.__();
       this._( this.menu.render( this.getMenuConfig() ) );
       this.__();
-      this._( `${this.status}` );
+      this._( Game.statusFormat(`${this.status}`) );
       this.__();
    }
 
@@ -126,9 +128,7 @@ export default class Game {
     * Output spacer
     */
    __(){
-      const spacer = `\n`
-         + Game.dividerFormat( "―·――――·―".repeat(5) )
-         + `\n`;
+      const spacer = Game.dividerFormat( "―·――――·―".repeat(5) );
       return this._( spacer );
    }
 
@@ -169,7 +169,10 @@ export default class Game {
 
       return str.replace(
          /(\(([\d]+)\))/g,
-         (match, p1, p2) => nums[parseInt(p2)] + " "
+         (match, p1, p2) => {
+            const symbol = nums[parseInt(p2)];
+            return Game.indexFormat( symbol ) + ' ';
+         }
       );
    }
 
