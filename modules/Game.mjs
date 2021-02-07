@@ -177,11 +177,11 @@ export default class Game {
    }
 
    /**
-    * Replace `__Header__` with `Game.headerFormat('Header')`
+    * Replace `[[Header]]` with `Game.headerFormat('Header')`
     */
    fancyHeaders(str){
       return str.replace(
-         /__(.*)__/g,
+         /\[\[(.*)\]\]/g,
          (match, p1) => Game.headerFormat( ` ${p1} ` ) + `\n`
       );
    }

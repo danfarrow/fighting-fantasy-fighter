@@ -54,7 +54,7 @@ export default class Inventory extends AbstractModule {
 
       return this.state.a.reduce(
          ( output, item, i ) => `${output}\n(${i}) ${item}`,
-         `__${ this.moduleName }__`
+         `[[${ this.moduleName }]]`
       );
    }
 

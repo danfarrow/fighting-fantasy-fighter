@@ -102,7 +102,7 @@ export default class Character extends AbstractModule {
 
    getRenderShort(){
 
-      return `__${this.getName()}__\n`
+      return `[[${this.getName()}]]\n`
          + this.getAttributesShort();
    }
 
