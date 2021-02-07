@@ -46,7 +46,7 @@ export default class Inventory extends AbstractModule {
    removed( item ){ return `${item} was dropped` }
 
    getRender(){
-      if( !this.state.a.length ) return `[${ this.moduleName } empty]`;
+      if( !this.state.a.length ) return;
       return this.state.a.reduce(
          ( output, item, i ) => `${output}\n(${i}) ${item}`,
          `__${ this.moduleName }__`
