@@ -14,7 +14,6 @@ import Encounters from "./Encounters.mjs"
  */
 export default class Game {
    constructor(){
-      this.status = "Welcome!";
 
       // Output indentation
       this.indent = `    `;
@@ -37,6 +36,9 @@ export default class Game {
 
       // Try to load autosave
       this.snapshots.import( 'autosave' );
+
+      // Greet player
+      this.status = `Welcome ${this.player.getName()}!`;
 
       //Start input loop
       this.start();
@@ -104,8 +106,30 @@ export default class Game {
 
       if( !txt ) return console.log();
 
+      // Replace `(1)`, `(2)` etc
+      txt = this.fancyNumbers(txt);
+
+      // Indent output
       const regex = /\n/gi;
       console.log( this.indent + txt.replace(regex, `\n${ this.indent }`) );
+   }
+
+   /**
+    * Replace `(1) First`, `(2) Second`, `(12) Twelfth` etc.
+    * with `① First`, `② Second`, `⑫ Twelfth` etc.
+    */
+   fancyNumbers(str){
+
+      const nums =
+         ['①','②','③','④','⑤',
+          '⑥','⑦','⑧','⑨','⑩',
+          '⑪','⑫','⑬','⑭','⑮',
+          '⑯','⑰','⑱','⑲','⑳'];
+
+      return str.replace(
+         /(\(([\d]+)\))/g,
+         (match, p1, p2) => nums[parseInt(p2)]
+      );
    }
 
    /**
@@ -113,7 +137,7 @@ export default class Game {
     */
    quit(){
       this._( this.snapshots.export( 'autosave' ) );
-      console.log();
+      this._();
       process.exit();
    }
 

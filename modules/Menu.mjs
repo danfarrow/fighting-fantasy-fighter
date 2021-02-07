@@ -25,17 +25,9 @@ export default class Menu {
    render(config){
       this.config = config;
 
-      const nums =
-         ['①','②','③','④','⑤',
-          '⑥','⑦','⑧','⑨','⑩',
-          '⑪','⑫','⑬','⑭','⑮',
-          '⑯','⑰','⑱','⑲','⑳']
-
-      // Render config array as numbered options
-      // Items < 10 have a double space after
-      // to keep everything lined up
+      // Render array of menu entries
       const reducer = (out, opt, i) =>
-         out += `${ nums[i] }  ${opt.title}\n`;
+         out += `(${i})  ${opt.title}\n`;
 
       return `Menu:\n\n`
          + config.reduce( reducer, `` )
