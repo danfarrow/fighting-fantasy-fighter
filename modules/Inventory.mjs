@@ -14,27 +14,31 @@ export default class Inventory extends AbstractModule {
 
    add(){
       const item = this.prompt( `Add item name` );
-      this.state.a.push(item);
+
+      this.state.a.push( item );
 
       // Autoclose menu item
       this.close();
 
-      return `${item} added to inventory`;
+      return `${item} was added to inventory`;
    }
 
    remove(){
-      const item = this.prompt( `Remove item` );
-      const i = this.state.a.indexOf(item);
 
-      if( i == undefined ) {
-         return `${item} not found`;
+      const itemNumber = parseInt( this.prompt( `Remove item #` ) );
+      const item = this.state.a[ itemNumber ];
+
+      if( item === undefined ) {
+         return `Item ${itemNumber} not found`;
       }
+
+      // Remove item
+      this.state.a = this.arrayPluck( this.state.a, itemNumber );
 
       // Autoclose menu item
       this.close();
 
-      this.state.a = this.arrayPluck( this.state.a, i );
-      return `${item} dropped`;
+      return `${item} was dropped`;
    }
 
    getRender(){
@@ -50,7 +54,7 @@ export default class Inventory extends AbstractModule {
             action: ()=>this.add()
          },
          {
-            title: "Remove",
+            title: "Drop",
             action: ()=>this.remove()
          }
       ]
