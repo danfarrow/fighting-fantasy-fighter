@@ -1,6 +1,7 @@
 "use strict";
 
 import AbstractModule from "./AbstractModule.mjs";
+import Game from "./Game.mjs";
 
 /**
  * Simple dice roll with ascii display
@@ -101,6 +102,6 @@ export default class Dice extends AbstractModule {
          }
       }
 
-      return asciiArr.join(`\n`);
+      return Game.diceFormat( asciiArr.join(`\n`) );
    }
 }

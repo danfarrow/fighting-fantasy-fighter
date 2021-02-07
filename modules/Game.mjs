@@ -14,6 +14,12 @@ import Encounters from "./Encounters.mjs"
  * Game manager
  */
 export default class Game {
+
+   static colWidth = 60;
+   static headerFormat = clc.xterm(195).bgXterm(31);
+   static dividerFormat = clc.blackBright;
+   static diceFormat = clc.xterm(230);
+
    constructor(){
 
       // Output indentation
@@ -107,20 +113,45 @@ export default class Game {
 
       if( !txt ) return console.log();
 
-      // Replace `(1)`, `(2)` etc
-      txt = this.fancyNumbers(txt);
+      // Filter text
+      txt = this.fancyNumbers( txt );
+      txt = this.fancyHeaders( txt );
 
       // Indent output
       const regex = /\n/gi;
-      console.log( this.indent + txt.replace(regex, `\n${ this.indent }`) );
+      console.log( this.indent + txt.replace( regex, `\n${ this.indent }`) );
    }
 
    /**
     * Output spacer
     */
    __(){
-      const spacer = `\n${"―·――――·―".repeat(5)}\n`;
+      const spacer = `\n`
+         + Game.dividerFormat( "―·――――·―".repeat(5) )
+         + `\n`;
       return this._( spacer );
+   }
+
+   /**
+    * Centre text at Game.colWidth
+    */
+   _centre(txt){
+      const w = Game.colWidth;
+      const txtLen = txt.length;
+
+      if( txtLen > w ) return txt;
+
+      const diff = w - txtLen;
+      const padLeft = Math.floor( diff/2 );
+      txt = " ".repeat( padLeft ) + txt;
+      return this._pad(txt);
+   }
+
+   /**
+    * Pad text to Game.colWidth
+    */
+   _pad(txt){
+      return txt.padEnd( Game.colWidth );
    }
 
    /**
@@ -139,6 +170,16 @@ export default class Game {
       return str.replace(
          /(\(([\d]+)\))/g,
          (match, p1, p2) => nums[parseInt(p2)] + " "
+      );
+   }
+
+   /**
+    * Replace `__Header__` with `Game.headerFormat('Header')`
+    */
+   fancyHeaders(str){
+      return str.replace(
+         /__(.*)__/g,
+         (match, p1) => Game.headerFormat( ` ${p1} ` ) + `\n`
       );
    }
 

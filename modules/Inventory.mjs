@@ -45,8 +45,13 @@ export default class Inventory extends AbstractModule {
    added( item ){ return `${item} was added to inventory` }
    removed( item ){ return `${item} was dropped` }
 
+   /**
+    * Get view content for this module
+    */
    getRender(){
+      // If empty then don't render anything
       if( !this.state.a.length ) return;
+
       return this.state.a.reduce(
          ( output, item, i ) => `${output}\n(${i}) ${item}`,
          `__${ this.moduleName }__`

@@ -88,9 +88,9 @@ export default class Character extends AbstractModule {
       const out = [];
 
       // Display attributes in full format:
-      // Attr: 99
-      // Attr: 99
-      // ...
+      // Skill: 10
+      // Stamina: 19
+      // etc.
       for(let attr in this.state.attributes){
          out.push(
             `${this.capitaliseFirst(attr)}: ${this.state.attributes[attr]}`
@@ -102,7 +102,7 @@ export default class Character extends AbstractModule {
 
    getRenderShort(){
 
-      return `${this.getName()}\n`
+      return `__${this.getName()}__\n`
          + this.getAttributesShort();
    }
 
