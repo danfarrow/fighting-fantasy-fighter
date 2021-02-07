@@ -149,6 +149,3 @@ export default class Game {
    }
 
 }
-
-// Instantiate game
-const game = new Game();
