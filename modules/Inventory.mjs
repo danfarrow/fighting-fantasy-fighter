@@ -20,16 +20,16 @@ export default class Inventory extends AbstractModule {
       // Autoclose menu item
       this.close();
 
-      return `${item} was added to inventory`;
+      return this.added( item );
    }
 
    remove(){
-
-      const itemNumber = parseInt( this.prompt( `Remove item #` ) );
+      const input = this.prompt( `Remove item #` );
+      const itemNumber = parseInt( input ) - 1;
       const item = this.state.a[ itemNumber ];
 
       if( item === undefined ) {
-         return `Item ${itemNumber} not found`;
+         return `Item ${input} not found`;
       }
 
       // Remove item
@@ -38,14 +38,18 @@ export default class Inventory extends AbstractModule {
       // Autoclose menu item
       this.close();
 
-      return `${item} was dropped`;
+      return this.removed(item);
    }
 
+   // To be overridden by subclass
+   added( item ){ return `${item} was added to inventory` }
+   removed( item ){ return `${item} was dropped` }
+
    getRender(){
-      if( !this.state.a.length ) return `[Inventory empty]`;
+      if( !this.state.a.length ) return `[${ this.moduleName } empty]`;
       return this.state.a.reduce(
          ( output, item, i ) => `${output}\n(${i}) ${item}`,
-         `__Inventory__`
+         `__${ this.moduleName }__`
       );
    }
 

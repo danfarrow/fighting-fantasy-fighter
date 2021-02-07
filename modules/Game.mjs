@@ -4,6 +4,7 @@ import clc from 'cli-color';
 import fs from 'fs';
 import Menu from "./Menu.mjs";
 import Dice from "./Dice.mjs";
+import Notes from "./Notes.mjs";
 import Player from "./Player.mjs";
 import Snapshots from "./Snapshots.mjs";
 import Inventory from "./Inventory.mjs";
@@ -21,6 +22,7 @@ export default class Game {
       // Instantiate modules
       this.menu = new Menu( this );
       this.dice = new Dice( this );
+      this.notes = new Notes( this );
       this.player = new Player( this );
       this.inventory = new Inventory( this );
       this.snapshots = new Snapshots( this );
@@ -29,6 +31,7 @@ export default class Game {
       this.modules = [
          this.player,
          this.inventory,
+         this.notes,
          this.encounters,
          this.snapshots,
          this.dice
