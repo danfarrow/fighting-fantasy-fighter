@@ -27,10 +27,9 @@ export default class Menu {
 
       // Render array of menu entries
       const reducer = (out, opt, i) =>
-         out += `(${i})  ${opt.title}\n`;
+         out += `(${i}) ${opt.title}\n`;
 
-      return `Menu:\n\n`
-         + config.reduce( reducer, `` )
+      return config.reduce( reducer, `__Menu__\n` )
          + `Ⓠ  Quit (with autosave)`;
    }
 

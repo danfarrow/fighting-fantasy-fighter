@@ -127,7 +127,10 @@ export default class Player extends Character {
    }
 
    getRender(){
-      if( this.isMenuOpen ) return super.getRender();
-      return super.getRenderShort();
+      return `__Player__\n`
+         + (this.isMenuOpen ?
+            super.getRender()
+            : super.getRenderShort()
+            )
    }
 }

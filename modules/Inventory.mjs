@@ -43,7 +43,10 @@ export default class Inventory extends AbstractModule {
 
    getRender(){
       if( !this.state.a.length ) return `[Inventory empty]`;
-      return `Inventory:\n` + this.state.a.join(`\n`);
+      return this.state.a.reduce(
+         ( output, item, i ) => `${output}\n(${i}) ${item}`,
+         `__Inventory__`
+      );
    }
 
    getMenuOpen(){
