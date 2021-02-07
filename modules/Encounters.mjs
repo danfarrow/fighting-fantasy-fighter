@@ -176,7 +176,14 @@ export default class Encounters extends AbstractModule {
    getRender(){
       const o = this.state.opponent;
       if( !o ) return;
-      return `Fighting: ${o.getRenderShort()}`;
+
+      const oName = o.getName();
+      const oStamina = o.getAttr('stamina');
+      const p = this.game.player;
+      const pName = p.getName();
+      const pStamina = p.getAttr('stamina');
+      return `${pName}\n${"♥ ".repeat(pStamina)}\n`
+         + `${"♥ ".repeat(oStamina)}\n${oName}`;
    }
 
    /**
