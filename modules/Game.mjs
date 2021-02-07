@@ -85,18 +85,16 @@ export default class Game {
     * Render the GUI
     */
    render(){
-      const spacer = `\n${"―·――――·―".repeat(5)}\n`;
-
       process.stdout.write(clc.reset);// Clear screen
       this._();
       this._();
-      this._( spacer );
+      this.__();
       this._( this.renderModules() );
-      this._( spacer );
-      this._( `${this.status}` );
-      this._( spacer );
+      this.__();
       this._( this.menu.render( this.getMenuConfig() ) );
-      this._( spacer );
+      this.__();
+      this._( `${this.status}` );
+      this.__();
    }
 
    /**
@@ -115,8 +113,17 @@ export default class Game {
    }
 
    /**
+    * Output spacer
+    */
+   __(){
+      const spacer = `\n${"―·――――·―".repeat(5)}\n`;
+      return this._( spacer );
+   }
+
+   /**
     * Replace `(1) First`, `(2) Second`, `(12) Twelfth` etc.
-    * with `① First`, `② Second`, `⑫ Twelfth` etc.
+    * with `①  First`, `②  Second`, `⑫  Twelfth` etc.
+    * Note extra space added as it looks clearer in the terminal
     */
    fancyNumbers(str){
 
@@ -128,7 +135,7 @@ export default class Game {
 
       return str.replace(
          /(\(([\d]+)\))/g,
-         (match, p1, p2) => nums[parseInt(p2)]
+         (match, p1, p2) => nums[parseInt(p2)] + " "
       );
    }
 
