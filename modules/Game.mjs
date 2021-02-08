@@ -156,16 +156,17 @@ export default class Game {
 
    /**
     * Replace `(1) First`, `(2) Second`, `(12) Twelfth` etc.
-    * with `①  First`, `②  Second`, `⑫  Twelfth` etc.
-    * Note extra space added as it looks clearer in the terminal
+    * with `❶  First`, `❷  Second`, `⓬  Twelfth` etc.
+    * Note: extra space added as it looks clearer in the terminal
     */
    fancyNumbers(str){
 
-      const nums =
-         ['①','②','③','④','⑤',
-          '⑥','⑦','⑧','⑨','⑩',
-          '⑪','⑫','⑬','⑭','⑮',
-          '⑯','⑰','⑱','⑲','⑳'];
+      const nums = [
+         '❶','❷','❸','❹','❺',
+         '❻','❼','❽','❾','❿',
+         '⓫','⓬','⓭','⓮','⓯',
+         '⓰','⓱','⓲','⓳','⓴'
+      ];
 
       return str.replace(
          /(\(([\d]+)\))/g,
