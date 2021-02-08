@@ -34,7 +34,7 @@ export default class Encounters extends AbstractModule {
       const pAttr = p.getAttributesShort();
 
       this.state.log = {
-         title: `${pName}\n[${pAttr}]\n   v.s.  \n${oName}\n[${oAttr}]`,
+         title: `${pName} [${pAttr}]\n${oName} [${oAttr}]`,
          roundCount: 0
       }
 
@@ -57,8 +57,8 @@ export default class Encounters extends AbstractModule {
       this.state.log.roundCount++;
 
       // Calculate attack strengths (2 dice + skill)
-      const oAttackStrength = this.dice.roll(2) + o.getAttr('skill');
-      const pAttackStrength = this.dice.roll(2) + p.getAttr('skill');
+      const oAttackStrength = this.dice.roll(2) + o.getAttr( 'skill' );
+      const pAttackStrength = this.dice.roll(2) + p.getAttr( 'skill' );
 
       let damage = 2;
       let instantDeath = false;
@@ -66,7 +66,7 @@ export default class Encounters extends AbstractModule {
       // Check for double roll / instant death!
       if( this.dice.double ){
          instantDeath = true;
-         damage = o.getAttr('stamina');
+         damage = o.getAttr( 'stamina' );
       }
 
       const diff = pAttackStrength - oAttackStrength;
