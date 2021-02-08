@@ -126,12 +126,16 @@ export default class Player extends Character {
    }
 
    getMenuOpen(){
-      const menu = [
-         {
-            title: "Test your luck",
-            action: ()=> this.testLuck()
-         }
-      ];
+      const menu = [];
+
+      if( this.getAttr('luck') > 0 ){
+         menu.push(
+            {
+               title: `Test Your Luck [${ this.getAttr('luck') }]`,
+               action: ()=> this.testLuck()
+            }
+         )
+      };
 
       return [
          ...super.getMenuOpen(),
