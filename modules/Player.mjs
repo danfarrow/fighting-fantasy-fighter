@@ -102,21 +102,25 @@ export default class Player extends Character {
    }
 
    getMenuOpen(){
-      const menu = [];
+      return this.getMenu( super.getMenuOpen() );
+   }
+
+   getMenuClosed(){
+      return this.getMenu( super.getMenuClosed() );
+   }
+
+   getMenu( menu ){
 
       if( this.getAttr('luck') > 0 ){
          menu.push(
             {
-               title: `Test Your Luck [${ this.getAttr('luck') }]`,
+               title: `Test luck [${ this.getAttr('luck') }]`,
                action: ()=> this.testLuck()
             }
          )
       };
 
-      return [
-         ...super.getMenuOpen(),
-         ...menu
-      ]
+      return menu;
    }
 
    getRender(){
