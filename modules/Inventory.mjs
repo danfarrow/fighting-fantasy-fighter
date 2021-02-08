@@ -41,6 +41,18 @@ export default class Inventory extends AbstractModule {
       return this.removed(item);
    }
 
+   /**
+    * Remove all items
+    */
+   removeAll(){
+      if( this.yesNoPrompt( `Are you sure?`) ){
+         this.state.a = [];
+         return `${this.moduleName} cleared`;
+      } else {
+         return `Remove all cancelled`;
+      }
+   }
+
    // To be overridden by subclass
    added( item ){ return `${item} was added to inventory` }
    removed( item ){ return `${item} was dropped` }
@@ -72,6 +84,10 @@ export default class Inventory extends AbstractModule {
             {
                title: "Drop",
                action: ()=>this.remove()
+            },
+            {
+               title: "Drop all…",
+               action: ()=>this.removeAll()
             }
          );
       }
