@@ -84,8 +84,10 @@ export default class AbstractModule {
 
          // Prepend indent to each config item
          for(let i = 1; i < menuConfig.length; i++){
-            const s = i < menuConfig.length -1 ? `├─` : `└─`;
-            menuConfig[i].title = `${s} ${menuConfig[i].title}`;
+            const s = Game.dividerFormat(
+               i < menuConfig.length -1 ? `├─` : `└─`
+            );
+            menuConfig[i].title = `${s}${menuConfig[i].title}`;
          }
          return menuConfig;
       }
@@ -124,7 +126,7 @@ export default class AbstractModule {
    getMenuOpen(){
       return [
          {
-            title: `${this.moduleName} [×]`,
+            title: `${this.moduleName} ${Game.dividerFormat(`⊗`)}`,
             action: ()=>this.close()
          }
       ]
