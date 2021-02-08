@@ -221,7 +221,10 @@ export default class Encounters extends AbstractModule {
       return out.join( `\n\n` );
    }
 
-
+   /**
+    * If an encounter is in progress
+    * show opponent name in menu
+    */
    getMenuClosed(){
       const o = this.state.opponent;
       const out = [];
@@ -233,18 +236,9 @@ export default class Encounters extends AbstractModule {
             }
          :{
             title: `Encounter…`,
-            action: ()=>this.start()
+            action: ()=>this.open()
          }
       );
-
-      if( this.state.history.length ){
-         out.push(
-            {
-               title: `Encounter history`,
-               action: ()=>this.history()
-            }
-         );
-      }
 
       return out;
    }
@@ -254,31 +248,55 @@ export default class Encounters extends AbstractModule {
     */
    getMenuOpen(){
 
+      const p = this.player;
+      const canUseLuck = this.player.getAttr( 'luck' ) > 0;
       const o = this.state.opponent;
-      const opts = [];
+      const opts = [ ...super.getMenuOpen() ];
 
-      if( o ){
+      // Menu differs depending on whether an
+      // encounter is in progress
+      if( !o ){
+         opts.push(
+            {
+               title: `Start encounter`,
+               action: ()=>this.start()
+            }
+         )
+
+         // If there is an encounter history
+         // add `Encounter history` menu item
+         if( this.state.history.length ){
+            opts.push(
+               {
+                  title: `Encounter history`,
+                  action: ()=>this.history()
+               }
+            );
+         }
+
+      } else {
+         // An encounter is in progress - add `Attack...`,
+         // `Use luck` (if available), `End encounter`
+         // & opponent attribute menu items
          opts.push(
             {
                title: `Attack ${o.getName()}`,
                action: ()=>this.attack()
             }
          )
-      }
 
-      if( this.state.useLuckConfig ){
+         if( this.state.useLuckConfig && canUseLuck ){
+            opts.push(
+               {
+                  title: this.state.useLuckConfig.title,
+                  action: ()=>this.useLuck()
+               }
+            )
+         }
+
          opts.push(
             {
-               title: this.state.useLuckConfig.title,
-               action: ()=>this.useLuck()
-            }
-         )
-      }
-
-      if( o ){
-         opts.push(
-            {
-               title: `End encounter`,
+               title: `Escape encounter`,
                action: ()=>this.end()
             }
          );
