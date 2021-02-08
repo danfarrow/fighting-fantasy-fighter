@@ -48,6 +48,15 @@ export default class AbstractModule {
    }
 
    /**
+    * Number prompt
+    */
+   numberPrompt( msg = `Please enter a number` ){
+      const input = this.prompt( `${msg}` );
+      const number = parseInt( input );
+      return isNaN( number ) ? this.numberPrompt() : number;
+   }
+
+   /**
     * Set this module to `open`
     */
    open(){

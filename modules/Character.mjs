@@ -24,6 +24,7 @@ export default class Character extends AbstractModule {
     * Return the requested attribute
     */
    getAttr(attr){
+      attr = attr.toLowerCase();
       return this.state.attributes[attr];
    }
 
@@ -44,36 +45,53 @@ export default class Character extends AbstractModule {
 
    /**
     * Set an attribute value
+    *
+    * string attr Name of attribute
+    * int/string value Type-checked value
     */
-   setAttr(attr, value){
-
-      // Convert to integer (except name)
-      if( "name" !== attr ) {
-         value = parseInt(value);
-         if( isNaN(value) ) return "Please enter a number";
-      }
-
-      this.state.attributes[attr] = value;
-      return `${ this.capitaliseFirst(attr) } set to ${ value }`;
+   setAttr( attr, value ){
+      if( !value ) return `Cancelled`;
+      attr = attr.toLowerCase();
+      this.state.attributes[ attr ] = value;
+      return `Changed ${ this.getAttrCaption( attr ) }`;
    }
 
    /**
-    * Menu callback to prompt & set attribute value
+    * Prompt for input to set attribute value
     */
-   setAttrPrompt(attr){
-      const oldValue = this.state.attributes[attr];
-      let value = this.prompt( `Set ${ attr } [${ oldValue }]`);
-      return this.setAttr(attr, value);
+   getAttrPrompt(attr){
+      const caption = `Set ${ this.getAttrCaption( attr ) }`;
+
+      return "name" === attr ?
+         this.prompt( caption )
+         : this.numberPrompt( caption );
    }
 
+   /**
+    * Return attribute Name [value]
+    */
+   getAttrCaption( attr, capitalise = false ){
+
+      attr = attr.toLowerCase();
+      if( !this.state.attributes[attr] ) return;
+
+      const attrValue = this.state.attributes[attr];
+      const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
+      return `${ attrName } [${ attrValue }]`;
+   }
+
+   /**
+    * Populate menu in open state
+    */
    getMenuOpen(){
       // Build dynamic menu to set stats values
       const menu = [];
+
       for( const attr in this.state.attributes ) {
          menu.push(
             {
-               title: `Change ${attr}`,
-               action: ()=> this.setAttrPrompt(attr)
+               title: this.getAttrCaption( attr, true ),
+               action: ()=> this.setAttr( attr, this.getAttrPrompt( attr ))
             }
          );
       }

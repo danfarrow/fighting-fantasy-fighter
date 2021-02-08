@@ -41,45 +41,21 @@ export default class Player extends Character {
    }
 
    /**
-    * Warn if attribute has an initial value
-    * which the change will make it exceed
+    * Return attribute Name [value/limit]
     */
-   setAttr( attr, value ){
+   getAttrCaption( attr, capitalise = false ){
 
-      const limits = this.state.attributeLimits;
-      const limit = limits[attr];
-      const v = parseInt(value);
+      attr = attr.toLowerCase();
+      if( !this.state.attributes[attr] ) return;
 
-      if( !limit ) return super.setAttr( attr, v );
-
-      if( v <= limit ) {
-         return super.setAttr( attr, v );
+      if( !this.state.attributeLimits[attr] ){
+         return super.getAttrCaption( attr, capitalise );
       }
 
-      // Get user confirmation
-      if(
-         !this.yesNoPrompt( `Update ${attr} limit from ${limit} to ${v}?` )
-      ){
-         return `Attribute change cancelled`;
-      }
-
-      // Update attribute limit
-      limits[attr] = v;
-      return super.setAttr( attr, v );
-   }
-
-   /**
-    * Menu callback to prompt & set attribute value
-    */
-   setAttrPrompt(attr){
-      const oldValue = this.state.attributes[attr];
-      const limits = this.state.attributeLimits;
-      const limit = limits[attr];
-
-      let value = this.prompt(
-         `Set ${ attr } [${ oldValue }${ limit ? `/${limit}` : ''}]`
-      );
-      return this.setAttr(attr, value);
+      const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
+      const v = this.state.attributes[attr];
+      const limit = this.state.attributeLimits[attr];
+      return `${ attrName } [${ v }/${ limit }]`;
    }
 
    /**
