@@ -47,25 +47,39 @@ export default class Player extends Character {
    setAttr( attr, value ){
 
       const limits = this.state.attributeLimits;
+      const limit = limits[attr];
+      const v = parseInt(value);
 
-      if( !limits[attr] ) return super.setAttr( attr, value );
+      if( !limit ) return super.setAttr( attr, v );
 
-      if( parseInt(value) <= limits[attr] ) {
-         return super.setAttr( attr, value );
+      if( v <= limit ) {
+         return super.setAttr( attr, v );
       }
 
       // Get user confirmation
-      const accept = this.prompt(
-         `Update ${attr} maximum value? [y/n]`
-      );
-
-      if( accept.toLowerCase() !== 'y' ) {
+      if(
+         !this.yesNoPrompt( `Update ${attr} limit from ${limit} to ${v}?` )
+      ){
          return `Attribute change cancelled`;
       }
 
       // Update attribute limit
-      limits[attr] = parseInt(value);
-      return super.setAttr( attr, value );
+      limits[attr] = v;
+      return super.setAttr( attr, v );
+   }
+
+   /**
+    * Menu callback to prompt & set attribute value
+    */
+   setAttrPrompt(attr){
+      const oldValue = this.state.attributes[attr];
+      const limits = this.state.attributeLimits;
+      const limit = limits[attr];
+
+      let value = this.prompt(
+         `Set ${ attr } [${ oldValue }${ limit ? `/${limit}` : ''}]`
+      );
+      return this.setAttr(attr, value);
    }
 
    /**
@@ -114,8 +128,8 @@ export default class Player extends Character {
    getMenuOpen(){
       const menu = [
          {
-               title: "Test your luck",
-               action: ()=> this.testLuck()
+            title: "Test your luck",
+            action: ()=> this.testLuck()
          }
       ];
 
