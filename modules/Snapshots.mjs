@@ -36,7 +36,7 @@ export default class Snapshots extends AbstractModule {
    /**
     * Remove selected snapshot
     */
-   delete(){
+   remove(){
       const snapshotNumber = this.prompt( `Remove snapshot #` );
       const number = parseInt( snapshotNumber );
 
@@ -53,12 +53,24 @@ export default class Snapshots extends AbstractModule {
    }
 
    /**
+    * Remove all items
+    */
+   removeAll(){
+      if( this.yesNoPrompt( `Are you sure?`) ){
+         this.state = {};
+         return `${this.moduleName} cleared`;
+      } else {
+         return `Remove all cancelled`;
+      }
+   }
+
+   /**
     * Show list of snapshots
     */
-   list(){
-      let out = ['Snapshots:'];
+   getRender(){
+      let out = ['[[Snapshots]]'];
 
-      if( Object.keys(this.state).length === 0 ) return `[No snapshots]`;
+      if( !Object.keys(this.state).length ) return;
 
       for( const snapshot in this.state ) out.push(`${snapshot} ${this.state[snapshot].note}`);
       return out.join(`\n`);
@@ -165,20 +177,32 @@ export default class Snapshots extends AbstractModule {
     * Get open menu config
     */
    getMenuOpen(){
-      return [
+      const opts = [
          ...super.getMenuOpen(),
          {
             title: "Save snapshot",
             action: ()=>this.save()
-         },
-         {
-            title: "Restore snapshot",
-            action: ()=>this.restore()
-         },
-         {
-            title: "Delete snapshot",
-            action: ()=>this.delete()
-         },
+         }
+      ];
+
+      if ( Object.keys(this.state).length ){
+         opts.push(
+            {
+               title: "Restore snapshot",
+               action: ()=>this.restore()
+            },
+            {
+               title: "Delete snapshot",
+               action: ()=>this.remove()
+            },
+            {
+               title: "Delete all…",
+               action: ()=>this.removeAll()
+            }
+         );
+      }
+
+      opts.push(
          {
             title: "Export game to disk",
             action: ()=>this.export( this.prompt( 'Filename' ))
@@ -187,14 +211,8 @@ export default class Snapshots extends AbstractModule {
             title: "Import game from disk",
             action: ()=>this.import( this.prompt( 'Filename' ))
          }
-      ]
-   }
+      );
 
-   getRender(){
-      if( Object.keys(this.state).length === 0 ) {
-         return `[No snapshots]`;
-      }
-
-      return this.list();
+      return opts;
    }
 }
