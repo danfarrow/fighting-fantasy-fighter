@@ -9,7 +9,7 @@ import Game from './Game.mjs';
  */
 export default class AbstractModule {
 
-   static lastOpen = null;
+   static currentlyOpen = null;
 
    constructor(game){
       this.moduleName = this.constructor.name;
@@ -51,8 +51,8 @@ export default class AbstractModule {
     * Set this module to `open`
     */
    open(){
-      if(AbstractModule.lastOpen) AbstractModule.lastOpen.close();
-      AbstractModule.lastOpen = this;
+      if( AbstractModule.currentlyOpen ) AbstractModule.currentlyOpen.close();
+      AbstractModule.currentlyOpen = this;
 
       this.visible = true;
       return `${this.moduleName} menu opened`;
@@ -62,7 +62,7 @@ export default class AbstractModule {
     * Set this module to not `open`
     */
    close(){
-      AbstractModule.lastOpen = null;
+      AbstractModule.currentlyOpen = null;
 
       if( !this.alwaysVisible) this.visible = false;
       return `${this.moduleName} menu closed`;
@@ -72,14 +72,15 @@ export default class AbstractModule {
     * Is this menu currently open?
     */
    isOpen(){
-      return AbstractModule.lastOpen === this;
+      return AbstractModule.currentlyOpen === this;
    }
 
    /**
     * Return array of title & callback pairs
     */
    menu(){
-      if(this.isOpen()){
+      if( this.isOpen() ){
+
          const menuConfig = this.getMenuOpen();
 
          // Prepend indent to each config item
@@ -91,6 +92,8 @@ export default class AbstractModule {
          }
          return menuConfig;
       }
+
+      if( AbstractModule.currentlyOpen ) return [];
 
       return this.getMenuClosed();
    }
@@ -126,7 +129,7 @@ export default class AbstractModule {
    getMenuOpen(){
       return [
          {
-            title: `${this.moduleName} ${Game.dividerFormat(`⊗`)}`,
+            title: `${this.moduleName} ${Game.indexFormat(`⊗`)}`,
             action: ()=>this.close()
          }
       ]
