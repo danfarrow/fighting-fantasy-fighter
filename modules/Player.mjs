@@ -38,7 +38,6 @@ export default class Player extends Character {
       a.stamina = l.stamina = stamFunc();
       a.luck = l.luck = luckFunc();
       a.magic = magicFunc();
-
    }
 
    /**

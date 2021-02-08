@@ -39,6 +39,13 @@ export default class AbstractModule {
       );
    }
 
+   /**
+    * Y/N prompt
+    */
+   yesNoPrompt(msg){
+      const input = this.prompt( `${msg} [y/n]` );
+      return input.toLowerCase() === 'y';
+   }
 
    /**
     * Set this module to `open`
