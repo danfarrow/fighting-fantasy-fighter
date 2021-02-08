@@ -59,16 +59,23 @@ export default class Inventory extends AbstractModule {
    }
 
    getMenuOpen(){
-      return [
+      const opts = [
          ...super.getMenuOpen(),
          {
             title: "Add",
             action: ()=>this.add()
-         },
-         {
-            title: "Drop",
-            action: ()=>this.remove()
          }
-      ]
+      ];
+
+      if( this.state.a.length ){
+         opts.push(
+            {
+               title: "Drop",
+               action: ()=>this.remove()
+            }
+         );
+      }
+
+      return opts;
    }
 }
