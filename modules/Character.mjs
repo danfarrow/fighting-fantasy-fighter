@@ -130,19 +130,14 @@ export default class Character extends AbstractModule {
     */
    getAttributesShort(){
       const out = [];
+      const include = [ 'skill', 'stamina' ];
 
-      for(let attr in this.state.attributes){
+      for( const attr of include ){
 
-         // Skip name attribute
-         if( "name" == attr ) continue;
+         const abbr = this.capitaliseFirst( attr ).slice( 0, 2 );
+         const v = this.state.attributes[attr];
 
-         out.push(
-            `${
-               this.capitaliseFirst(attr).slice(0,2)
-            }:${
-               this.state.attributes[attr]
-            }`
-         );
+         out.push( `${ abbr }:${ v }` );
       };
 
       return out.join(` ╱ `);
