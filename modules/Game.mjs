@@ -1,14 +1,14 @@
 "use strict";
 
-import clc from 'cli-color';
 import fs from 'fs';
-import Menu from "./Menu.mjs";
+import clc from 'cli-color';
 import Dice from "./Dice.mjs";
+import Menu from "./Menu.mjs";
 import Notes from "./Notes.mjs";
 import Player from "./Player.mjs";
-import Snapshots from "./Snapshots.mjs";
 import Inventory from "./Inventory.mjs";
-import Encounters from "./Encounters.mjs"
+import Snapshots from "./Snapshots.mjs";
+import Encounters from "./Encounters.mjs";
 
 /**
  * Game manager
@@ -71,9 +71,11 @@ export default class Game {
     */
    getMenuConfig(){
       let menuConfig = [];
+
       for( let module of this.modules ){
          menuConfig = [...menuConfig, ...module.menu()];
       }
+
       return menuConfig;
    }
 

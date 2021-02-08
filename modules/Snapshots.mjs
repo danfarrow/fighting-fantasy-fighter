@@ -18,7 +18,7 @@ export default class Snapshots extends AbstractModule {
     * Add a new snapshot
     */
    save(){
-      const snapshotNumber = this.prompt( `Save snapshot #` );
+      const snapshotNumber = this.prompt( `Snapshot section #` );
       const number = parseInt( snapshotNumber );
       if( isNaN(number) ) return `Please enter a number`;
 
