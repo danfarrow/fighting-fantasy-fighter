@@ -19,8 +19,8 @@ export default class Game {
    static headerFormat = clc.xterm(116).bgXterm(31).bold;
    static dividerFormat = clc.xterm(190);
    static diceFormat = clc.xterm(190);
-   static promptFormat = clc.xterm(45).italic;
-   static statusFormat = clc.xterm(190).bold;
+   static promptFormat = clc.xterm(45).bold;
+   static statusFormat = clc.xterm(190).italic;
    static indexFormat = clc.xterm(45);
 
    constructor(){

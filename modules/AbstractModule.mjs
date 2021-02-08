@@ -35,14 +35,14 @@ export default class AbstractModule {
     */
    prompt(msg){
       return this.promptObj(
-         Game.promptFormat( this.indent + msg + ` ܀ ` )
+         Game.promptFormat( `${ this.indent }${ msg } ܀ ` )
       );
    }
 
    /**
     * Y/N prompt
     */
-   yesNoPrompt(msg){
+   yesNoPrompt( msg ){
       const input = this.prompt( `${msg} [y/n]` );
       return input.toLowerCase() === 'y';
    }
@@ -95,7 +95,7 @@ export default class AbstractModule {
          // Prepend indent to each config item
          for(let i = 1; i < menuConfig.length; i++){
             const s = Game.dividerFormat(
-               i < menuConfig.length -1 ? `├─` : `└─`
+               i < menuConfig.length -1 ? `├─ ` : `└─ `
             );
             menuConfig[i].title = `${s}${menuConfig[i].title}`;
          }
