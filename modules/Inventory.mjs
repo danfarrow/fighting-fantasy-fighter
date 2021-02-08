@@ -45,12 +45,14 @@ export default class Inventory extends AbstractModule {
     * Remove all items
     */
    removeAll(){
+
       if( this.yesNoPrompt( `Are you sure?`) ){
          this.state.a = [];
+         this.close();
          return `${this.moduleName} cleared`;
-      } else {
-         return `Remove all cancelled`;
       }
+
+      return `Cancelled`;
    }
 
    // To be overridden by subclass

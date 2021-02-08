@@ -58,10 +58,11 @@ export default class Snapshots extends AbstractModule {
    removeAll(){
       if( this.yesNoPrompt( `Are you sure?`) ){
          this.state = {};
+         this.close();
          return `${this.moduleName} cleared`;
-      } else {
-         return `Remove all cancelled`;
       }
+
+      return `Cancelled`;
    }
 
    /**
