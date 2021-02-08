@@ -17,7 +17,7 @@ export default class Game {
 
    static colWidth = 60;
    static headerFormat = clc.xterm(116).bgXterm(31).bold;
-   static dividerFormat = clc.blackBright;
+   static dividerFormat = clc.xterm(190);
    static diceFormat = clc.xterm(190);
    static promptFormat = clc.xterm(45).italic;
    static statusFormat = clc.xterm(190).bold;
@@ -60,7 +60,7 @@ export default class Game {
     * Start the input / command loop
     */
    start(){
-      while (true){
+      while ( true ){
          this.render();
          this.status = this.menu.getCommand();
       }
@@ -99,21 +99,24 @@ export default class Game {
     * Render the GUI
     */
    render(){
-      process.stdout.write(clc.reset);// Clear screen
+      // Clear screen
+      process.stdout.write(clc.reset);
+
+      // Render output with spacing & indentation
       this._();
       this._();
       this._( this.renderModules() );
-      this.__();
+      this._();
       this._( this.menu.render( this.getMenuConfig() ) );
-      this.__();
-      this._( Game.statusFormat(`${this.status}`) );
-      this.__();
+      this._();
+      this._( Game.statusFormat(`${ this.status }`) );
+      this._();
    }
 
    /**
     * Output text with indentation
     */
-   _(txt){
+   _( txt ){
 
       if( !txt ) return console.log();
 
@@ -127,17 +130,9 @@ export default class Game {
    }
 
    /**
-    * Output spacer
-    */
-   __(){
-      const spacer = Game.dividerFormat( "―·――――·―".repeat(5) );
-      return this._( spacer );
-   }
-
-   /**
     * Centre text at Game.colWidth
     */
-   _centre(txt){
+   _centre( txt ){
       const w = Game.colWidth;
       const txtLen = txt.length;
 
@@ -146,13 +141,13 @@ export default class Game {
       const diff = w - txtLen;
       const padLeft = Math.floor( diff/2 );
       txt = " ".repeat( padLeft ) + txt;
-      return this._pad(txt);
+      return this._pad( txt );
    }
 
    /**
     * Pad text to Game.colWidth
     */
-   _pad(txt){
+   _pad( txt ){
       return txt.padEnd( Game.colWidth );
    }
 
@@ -173,7 +168,7 @@ export default class Game {
       return str.replace(
          /(\(([\d]+)\))/g,
          (match, p1, p2) => {
-            const symbol = nums[parseInt(p2)];
+            const symbol = nums[parseInt( p2 )];
             return Game.indexFormat( symbol ) + ' ';
          }
       );
@@ -182,10 +177,10 @@ export default class Game {
    /**
     * Replace `[[Header]]` with `Game.headerFormat('Header')`
     */
-   fancyHeaders(str){
+   fancyHeaders( str ){
       return str.replace(
          /\[\[(.*)\]\]/g,
-         (match, p1) => Game.headerFormat( ` ${p1} ` ) + `\n`
+         (match, p1) => Game.headerFormat( ` ${ p1 } ` ) + `\n`
       );
    }
 
@@ -193,7 +188,7 @@ export default class Game {
     * Quit the app
     */
    quit(){
-      this._( this.snapshots.export( 'autosave' ) );
+      this._( this.snapshots.export( 'autosave' ));
       this._();
       process.exit();
    }
