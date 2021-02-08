@@ -20,8 +20,8 @@ export default class Encounters extends AbstractModule {
       this.open();
 
       const oName = this.prompt( 'Opponent name' );
-      const oSkill = this.prompt( 'Opponent skill' );
-      const oStamina = this.prompt( 'Opponent stamina' );
+      const oSkill = this.numberPrompt( 'Opponent skill' );
+      const oStamina = this.numberPrompt( 'Opponent stamina' );
 
       const o = new Character( this.game, oName );
       o.setAttr( 'skill', oSkill );
