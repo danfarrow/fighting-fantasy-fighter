@@ -126,9 +126,17 @@ export default class AbstractModule {
     * Placeholder methods for subclasses to overwrite
     */
    getMenuClosed(){
+
+      // For subclasses that have an array of items
+      // i.e. Inventory, Snapshots, Notes
+      const a = this.state.a;
+      const itemCount = a && a.length ?
+         Game.mCountFormat(` [${ a.length }]`)
+         : '';
+
       return [
          {
-            title: `${this.moduleName}…`,
+            title: `${this.moduleName}${ itemCount }…`,
             action: ()=>this.open()
          }
       ]

@@ -214,7 +214,7 @@ export default class Encounters extends AbstractModule {
 
       out.push(
          o ? {
-               title: `Encounter with ${o.getName()}…`,
+               title: `Encounter [${o.getName()}]…`,
                action: ()=>this.open()
             }
          :{

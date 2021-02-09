@@ -1,6 +1,7 @@
 "use strict";
 
 import Character from "./Character.mjs";
+import Game from './Game.mjs';
 
 /**
  * Player class
@@ -112,9 +113,12 @@ export default class Player extends Character {
    getMenu( menu ){
 
       if( this.getAttr('luck') > 0 ){
+         const luck = this.getAttr('luck');
+         const luckCount = Game.mCountFormat( `[${ luck }]` );
+
          menu.push(
             {
-               title: `Test luck [${ this.getAttr('luck') }]`,
+               title: `Test luck ${ luckCount }`,
                action: ()=> this.testLuck()
             }
          )

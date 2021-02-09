@@ -22,6 +22,7 @@ export default class Game {
    static promptFormat = clc.xterm(45).bold;
    static statusFormat = clc.xterm(190).italic;
    static indexFormat = clc.xterm(45);
+   static mCountFormat = clc.xterm(243);// Light grey
 
    constructor(){
 
