@@ -50,12 +50,15 @@ export default class Character extends AbstractModule {
     * int/string value Type-checked value
     */
    setAttr( attr, value ){
-      if( "" === value ) return `Cancelled`;
+      if( '' === value ) return `Cancelled`;
 
       attr = attr.toLowerCase();
 
-      // Attribute values cannot be negative
-      value = Math.max( value, 0 )
+      if( 'name' !== attr ){
+         // Numeric attribute values cannot be negative
+         value = Math.max( value, 0 );
+      }
+
       this.state.attributes[ attr ] = value;
 
       return `Changed ${ this.getAttrCaption( attr ) }`;
