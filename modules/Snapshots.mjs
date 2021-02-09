@@ -89,7 +89,7 @@ export default class Snapshots extends AbstractModule {
     * Show list of snapshots
     */
    getRender(){
-      if( !this.state.a.length ) return;
+      if( !this.state.a ) return;
 
       // Reduce array of snapshots into list
       return this.state.a.reduce(
@@ -122,8 +122,6 @@ export default class Snapshots extends AbstractModule {
     */
    restoreGameState( snapshot ){
 
-console.log(snapshot);
-
       const section = snapshot.section;
       let count = 0;
 
@@ -131,14 +129,14 @@ console.log(snapshot);
          const modName = module.moduleName;
 
          // Check if module exists in snapshot
-         if( !snapshot.state[modName] ) continue;
+         if( !snapshot.state[ modName ] ) continue;
 
-         module.state = snapshot.state[modName];
+         module.state = snapshot.state[ modName ];
          count++;
       }
 
       if( count ){
-         return `Section ${section} snapshot restored`;
+         return `Section ${ section } snapshot restored`;
       }
 
       return `Could not restore snapshot`;
@@ -195,7 +193,7 @@ console.log(snapshot);
       ];
 
       // If there are snapshots, add management options
-      if ( this.state.a.length ){
+      if ( this.state.a ){
          opts.push(
             {
                title: "Restore snapshot",
