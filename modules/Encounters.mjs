@@ -50,106 +50,76 @@ export default class Encounters extends AbstractModule {
     * @todo This is a bit monolithic
     */
    attack(){
-      const o = this.state.opponent;
-      const oName = o.getName();
-      const p = this.player;
-
       // Increment roundCount in log
       this.state.log.roundCount++;
 
-      // Calculate attack strengths (2 dice + skill)
-      const oAttackStrength = this.dice.roll(2) + o.getAttr( 'skill' );
-      const pAttackStrength = this.dice.roll(2) + p.getAttr( 'skill' );
+      const o = this.state.opponent;
+      const oName = o.getName();
+      const p = this.player;
+      const pName = p.getName();
 
-      let damage = 2;
-      let instantDeath = false;
+      // Calculate attack strengths (2 dice + skill)
+      const opponentAS = o.getAttackStrength( this.dice );
+      const playerAS = p.getAttackStrength( this.dice );
+
+      // Damage amount
+      const damage = 2;
 
       // Check for double roll / instant death!
-      if( this.dice.double ){
-         instantDeath = true;
-         damage = o.getAttr( 'stamina' );
-      }
+      const instantDeath = this.dice.double;
 
-      const diff = pAttackStrength - oAttackStrength;
       const out = [
-         `Your attack strength: ${pAttackStrength}`,
-         `${oName}’s attack strength: ${oAttackStrength}`
+         `${pName} attack: ${playerAS}`,
+         `${oName} attack: ${opponentAS}`
       ];
 
+      const diff = playerAS - opponentAS;
 
       if( diff < 0 && !instantDeath ){
 
-         out.push( `You were wounded!` );
-         p.setAttr('stamina', p.getAttr('stamina') - damage);
+         // Player was wounded
+         out.push( p.damage( damage ));
 
          // Use luck? Damage = lucky ? 1 : 3
          this.state.useLuckConfig = {
             title: "Use luck to reduce injury",
-            lucky:()=> {
-               p.setAttr('stamina', p.getAttr('stamina') + 1);
-               return `\nYour damage was reduced by 1`
-            },
-            unlucky:()=> {
-               p.setAttr('stamina', p.getAttr('stamina') - 1);
-               return `\nYour damage was increased by 1`
-            }
+            lucky: ()=> p.damage( -1 ),
+            unlucky: ()=> p.damage( 1 )
          };
 
          // Player died
-         if( p.getAttr('stamina') <= 0 ){
-
-            // Update log
-            const r = this.state.log.roundCount;
-            this.state.log.outcome = `${p.getName()} was killed in ${r} rounds`;
-
-            this.end();
-            return( `You were killed by ${oName}!` );
+         if( !p.isAlive() ){
+            return this.end( o, p );
          }
 
       } else if( diff > 0  || instantDeath ){
 
-         out.push(`${o.getName()} wounded!`);
-         o.setAttr('stamina', o.getAttr('stamina') - damage);
+         // Opponent was wounded
+         out.push( o.damage( damage ));
 
          // Use luck? damage = lucky ? 4 : 1
          this.state.useLuckConfig = {
             title: "Use luck to increase damage",
-            lucky:()=> {
-               o.setAttr('stamina', o.getAttr('stamina') - 2);
-               return `\n${o.getName()}’s damage was increased by 2`
-            },
-            unlucky:()=> {
-               o.setAttr('stamina', o.getAttr('stamina') + 1);
-               return `\n${o.getName()}’s damage was decreased by 1`
-            }
+            lucky: ()=> o.damage( 2 ),
+            unlucky: ()=> o.damage( -1 )
          };
 
          // Opponent died
-         if( o.getAttr('stamina') <= 0 ) {
+         if( !o.isAlive() ) {
 
             // Replace `[opponent] wounded!` message
             out.pop();
             out.push( `You killed ${oName}!` );
 
-            // Add instant death message
-            if( instantDeath ){
-               out.push( `INSTANT DEATH!` );
-            }
-
-            // Update log
-            const r = this.state.log.roundCount;
-            this.state.log.outcome = `${oName} killed in ${r} rounds`;
-
-            this.end();
+            return this.end( p, o, instantDeath );
          }
 
       } else {
-
-         out.push(`Miss!`);
-
+         // Nobody wounded
+         out.push( `Miss!` );
       };
 
-      return out.join(`\n`);
+      return out.join( `\n` );
    }
 
    /**
@@ -190,12 +160,24 @@ export default class Encounters extends AbstractModule {
    /**
     * Finish the current encounter & close menu
     */
-   end(){
-      const o = this.state.opponent;
-      const msg = `Encounter with ${o.getName()} ended`;
+   end( victor, loser, instantDeath = false ){
+      const r = this.state.log.roundCount;
+      let msg;
+
+      // Update log
+      if( victor ){
+         msg = `${ loser.getName() } killed by `
+            + `${ victor.getName() } in `
+            + `${ r } round${r > 1 ? 's' : ''}`;
+      } else {
+         msg = `Encounter with `
+            + this.state.opponent.getName()
+            + ` ended` ;
+      }
 
       // Save log
-      this.state.history.push(this.state.log);
+      this.state.log.outcome = msg;
+      this.state.history.push( this.state.log );
 
       // Reset
       delete this.state.log;

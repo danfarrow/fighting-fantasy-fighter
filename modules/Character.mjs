@@ -155,6 +155,33 @@ export default class Character extends AbstractModule {
    }
 
    /**
+    * Roll for attack strength
+    */
+   getAttackStrength( dice ){
+      return dice.roll(2) + this.getAttr( 'skill' );
+   }
+
+   /**
+    * Take damage
+    */
+   damage(amt){
+
+      this.setAttr(
+         'stamina',
+         this.getAttr( 'stamina' ) - amt
+      );
+
+      // @todo Handle message for negative amt
+      if( this.isAlive() ){
+         return `${ this.getName() } was ${ amt > 0 ? 'wounded' : 'healed' }!`;
+      }
+
+      // Check for death
+      return `${ this.getName() } is dead!`
+
+   }
+
+   /**
     * Capitalise attribute first letter
     */
    capitaliseFirst(txt){
