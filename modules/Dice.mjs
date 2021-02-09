@@ -83,7 +83,7 @@ export default class Dice extends AbstractModule {
       this.double = diceThrows[0] === diceThrows[1];
 
       this.status = this.getAscii(diceThrows);
-      return diceThrows.reduce((t,i)=>t+=i);
+      return diceThrows.reduce( ( t, i ) => t += i );
    }
 
    /**

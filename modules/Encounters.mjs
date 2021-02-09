@@ -15,9 +15,10 @@ export default class Encounters extends AbstractModule {
       this.state.history = [];
    }
 
+   /**
+    * Begin a new encounter
+    */
    start(){
-      // Encounter menu opens when a new encounter starts
-      this.open();
 
       const oName = this.prompt( 'Opponent name' );
       const oSkill = this.numberPrompt( 'Opponent skill' );
@@ -178,12 +179,12 @@ export default class Encounters extends AbstractModule {
       if( !o ) return;
 
       const oName = o.getName();
-      const oStamina = o.getAttr('stamina');
+      const oStamina = o.getAttr( 'stamina' );
       const p = this.game.player;
       const pName = p.getName();
-      const pStamina = p.getAttr('stamina');
-      return `${pName}\n${"♥ ".repeat(pStamina)}\n`
-         + `${"♥ ".repeat(oStamina)}\n${oName}`;
+      const pStamina = p.getAttr( 'stamina' );
+      return `${ pName }\n${ "♥ ".repeat( pStamina ) }\n`
+         + `${ "♥ ".repeat( oStamina )}\n${ oName }`;
    }
 
    /**

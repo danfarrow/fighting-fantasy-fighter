@@ -25,7 +25,7 @@ export default class Character extends AbstractModule {
     */
    getAttr(attr){
       attr = attr.toLowerCase();
-      return this.state.attributes[attr];
+      return this.state.attributes[ attr ];
    }
 
    /**
@@ -39,7 +39,7 @@ export default class Character extends AbstractModule {
     * Return name prepended with [DEAD] if dead
     */
    getName(){
-      const note = this.isAlive() ? "" : "[DEAD]";
+      const note = this.isAlive() ? '' : '[DEAD] ';
       return note + this.getAttr( 'name' );
    }
 
@@ -107,6 +107,9 @@ export default class Character extends AbstractModule {
       ]
    }
 
+   /**
+    * Return full text for character attributes
+    */
    getRender(){
       const out = [];
 
@@ -123,9 +126,12 @@ export default class Character extends AbstractModule {
       return out.join(`\n`);
    }
 
+   /**
+    * Return short text for character attributes
+    */
    getRenderShort(){
 
-      return `[[${this.getName()}]]\n`
+      return `[[${ this.getName() }]]\n`
          + this.getAttributesShort();
    }
 

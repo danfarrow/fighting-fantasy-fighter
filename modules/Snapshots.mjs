@@ -206,11 +206,11 @@ export default class Snapshots extends AbstractModule {
       opts.push(
          {
             title: "Export game to disk",
-            action: ()=>this.export( this.prompt( 'Filename' ))
+            action: ()=>this.export( this.prompt( 'Export filename' ))
          },
          {
             title: "Import game from disk",
-            action: ()=>this.import( this.prompt( 'Filename' ))
+            action: ()=>this.import( this.prompt( 'Import filename' ))
          }
       );
 
