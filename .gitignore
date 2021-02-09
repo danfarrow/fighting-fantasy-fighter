@@ -1,3 +1,5 @@
 node_modules
 notes.md
 *.json
+!package.json
+!package-lock.json
