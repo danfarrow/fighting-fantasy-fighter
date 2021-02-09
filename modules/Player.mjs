@@ -56,7 +56,7 @@ export default class Player extends Character {
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       const v = this.state.attributes[attr];
       const limit = this.state.attributeLimits[attr];
-      return `${ attrName } [${ v }/${ limit }]`;
+      return `${ attrName } ${ Game.mCountFormat( `[${ v }/${ limit }]` ) }`;
    }
 
    /**
@@ -71,13 +71,12 @@ export default class Player extends Character {
          lucky = false;
          out.push( "No luck points" );
       } else {
-         const diceResult = this.dice.roll(2);
-         //out.push(`You rolled ${diceResult}`);
+         const diceResult = this.dice.rollVisible( 2 );
          lucky = diceResult <= this.state.attributes.luck;
-         this.state.attributes.luck -= 1;
+         this.setAttr( 'luck', this.getAttr( 'luck' ) - 1 );
       }
 
-      out.push( this.getLuckAscii( lucky ));
+      out.push( lucky ? 'LUCKY!' : 'UNLUCKY!' );
 
       return returnBool ? lucky : out.join( `\n` );
    }
@@ -128,6 +127,6 @@ export default class Player extends Character {
    }
 
    getRender(){
-      return this.isMenuOpen ? super.getRender() : super.getRenderShort()
+      return this.isMenuOpen ? super.getRender() : this.getFightStatus()
    }
 }

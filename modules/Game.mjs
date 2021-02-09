@@ -15,13 +15,16 @@ import Encounters from "./Encounters.mjs";
  */
 export default class Game {
 
-   static colWidth = 60;
-   static headerFormat = clc.xterm(116).bgXterm(31).bold;
-   static dividerFormat = clc.xterm(190);
-   static diceFormat = clc.xterm(190);
-   static promptFormat = clc.xterm(45).bold;
+   static colWidth = 60;// Set width for centering / padding
+   static headerFormat = clc.xterm(116).bgXterm(31).bold;// Turquoise on blue
+   static dividerFormat = clc.xterm(190);// Lime green
+   static diceFormat = clc.xterm(190);// Lime green
+   static diceFormatOpponent = clc.xterm(127);// Soft purple
+   static healthFormat = clc.xterm(197);// Soft red
+   static healthFormatOpponent = clc.xterm(127);// Soft purple
+   static promptFormat = clc.xterm(45).bold;// Vivid blue
    static statusFormat = clc.xterm(190).italic;
-   static indexFormat = clc.xterm(45);
+   static indexFormat = clc.xterm(45);// Vivid blue
    static mCountFormat = clc.xterm(243);// Light grey
 
    constructor(){
@@ -40,11 +43,11 @@ export default class Game {
 
       this.modules = [
          this.player,
+         this.encounters,
+         this.dice,
          this.inventory,
          this.notes,
-         this.encounters,
          this.snapshots,
-         this.dice
       ];
 
       // Try to load autosave

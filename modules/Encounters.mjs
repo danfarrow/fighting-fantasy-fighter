@@ -59,14 +59,15 @@ export default class Encounters extends AbstractModule {
       const pName = p.getName();
 
       // Calculate attack strengths (2 dice + skill)
-      const opponentAS = o.getAttackStrength( this.dice );
-      const playerAS = p.getAttackStrength( this.dice );
+      const roll = this.dice.combatRoll( 2 );
+      const playerAS = p.getAttackStrength( roll[0] + roll[1] );
+      const opponentAS = o.getAttackStrength( roll[2] + roll[3] );
+
+      // Check for double roll / instant death!
+      const instantDeath = roll[0] === roll[1];
 
       // Damage amount
       const damage = 2;
-
-      // Check for double roll / instant death!
-      const instantDeath = this.dice.double;
 
       const out = [
          `${pName} attack: ${playerAS}`,
@@ -95,7 +96,7 @@ export default class Encounters extends AbstractModule {
       } else if( diff > 0  || instantDeath ){
 
          // Opponent was wounded
-         out.push( o.damage( damage ));
+         out.push( o.damage( instantDeath ? o.getAttr( 'stamina' ) : damage ));
 
          // Use luck? damage = lucky ? 4 : 1
          this.state.useLuckConfig = {
@@ -148,13 +149,7 @@ export default class Encounters extends AbstractModule {
       const o = this.state.opponent;
       if( !o ) return;
 
-      const oName = o.getName();
-      const oStamina = o.getAttr( 'stamina' );
-      const p = this.game.player;
-      const pName = p.getName();
-      const pStamina = p.getAttr( 'stamina' );
-      return `${ pName }\n${ "♥ ".repeat( pStamina ) }\n`
-         + `${ "♥ ".repeat( oStamina )}\n${ oName }`;
+      return o.getFightStatusArr().join( `\n` );
    }
 
    /**

@@ -1,6 +1,7 @@
 "use strict";
 
 import AbstractModule from "./AbstractModule.mjs";
+import Game from "./Game.mjs";
 
 /**
  * Character class
@@ -85,7 +86,7 @@ export default class Character extends AbstractModule {
 
       const attrValue = this.state.attributes[attr];
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
-      return `${ attrName } [${ attrValue }]`;
+      return `${ attrName } ${ Game.mCountFormat( `[${ attrValue }]` )}`;
    }
 
    /**
@@ -130,15 +131,6 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Return short text for character attributes
-    */
-   getRenderShort(){
-
-      return `[[${ this.getName() }]]\n`
-         + this.getAttributesShort();
-   }
-
-   /**
     * Return string of attributes in truncated format:
     * e.g. Sk:99 ╱ St:99 ╱ ...
     */
@@ -158,10 +150,30 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Roll for attack strength
+    * Return attack strength (2 dice + skill)
     */
-   getAttackStrength( dice ){
-      return dice.roll(2) + this.getAttr( 'skill' );
+   getAttackStrength( diceRoll ){
+      return diceRoll + this.getAttr( 'skill' );
+   }
+
+   /**
+    * Return short status text
+    */
+   getFightStatus(){
+      return this.getFightStatusArr().join( `\n` );
+   }
+
+   /**
+    * Return array of lines for fight status
+    */
+   getFightStatusArr(){
+      const skillString = "⚔ ".repeat( this.getAttr( 'skill' ));
+      const staminaString = "♥ ".repeat( this.getAttr( 'stamina' ));
+
+      const out = [ `[[${ this.getName() }]]${ skillString}` ];
+      out.push( staminaString );
+
+      return out;
    }
 
    /**
