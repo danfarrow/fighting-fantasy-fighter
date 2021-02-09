@@ -11,108 +11,107 @@ export default class Snapshots extends AbstractModule {
    constructor( game ){
       super( game );
       this.fs = fs;
-      this.state = {};
+      this.state.a = [];
    }
 
    /**
-    * Add a new snapshot
+    * Add a new snapshot as { section, note, state }
     */
-   save(){
-      const snapshotNumber = this.prompt( `Snapshot section #` );
-      const number = parseInt( snapshotNumber );
-      if( isNaN(number) ) return `Please enter a number`;
+   add(){
+      const section = this.numberPrompt( `Current section #` );
+      const note = this.prompt( `Add a note` );
 
-      const note = this.prompt( `Snapshot note` );
-
-      this.state[number] = this.getGameState();
-      this.state[number].note = note;
+      this.state.a.push({
+         section: section,
+         note: note,
+         state: this.getGameState()
+      });
 
       // Autoclose menu item
       this.close();
-
-      return `Snapshot ${number} was saved`;
+      return this.added( section );
    }
+
 
    /**
     * Remove selected snapshot
     */
    remove(){
-      const snapshotNumber = this.prompt( `Remove snapshot #` );
-      const number = parseInt( snapshotNumber );
+      const n = this.numberPrompt( `Remove snapshot #` );
+      const snapshot = this.state.a[n - 1];
 
-      if( !this.state[number] ) {
-         return `Snapshot ${number} not found`;
+      if( !snapshot ) {
+         return `Snapshot ${n} not found`;
       }
 
-      delete this.state[number];
+      const section = snapshot.section;
+      this.state.a = this.arrayPluck( this.state.a, n - 1 );
 
       // Autoclose menu item
       this.close();
-
-      return `Snapshot ${number} was removed`;
+      return this.removed( section );
    }
 
+   // @todo Overridden from superclass
+   added( item ){ return `Section ${ item } snapshot saved` };
+   removed( item ){ return `Section ${ item } snapshot removed`; }
    /**
     * Remove all items
     */
    removeAll(){
       if( this.yesNoPrompt( `Are you sure?`) ){
-         this.state = {};
+         this.state.a = [];
          this.close();
-         return `${this.moduleName} cleared`;
+         return `${ this.moduleName } cleared`;
       }
 
       return `Cancelled`;
    }
 
    /**
-    * Show list of snapshots
-    */
-   getRender(){
-      let out = ['[[Snapshots]]'];
-
-      if( !Object.keys(this.state).length ) return;
-
-      for( const snapshot in this.state ) out.push(`${snapshot} ${this.state[snapshot].note}`);
-      return out.join(`\n`);
-   }
-
-   /**
     * Restore snapshot
     */
    restore(){
-      const snapshotNumber = this.prompt( `Restore snapshot #` );
-      const number = parseInt( snapshotNumber );
-      const snapshotObj = this.state[number];
+      const n = this.numberPrompt( `Restore snapshot #` );
+      const snapshot = this.state.a[n - 1];
 
-      if( !snapshotObj ) {
-         return `Snapshot ${number} not found`;
+      if( !snapshot ) {
+         return `Snapshot ${ n } not found`;
       }
 
-      if( this.restoreGameState(snapshotObj) ){
+      // Autoclose menu item
+      this.close();
 
-         // Autoclose menu item
-         this.close();
-         return `Snapshot ${number} restored`;
+      return this.restoreGameState( snapshot );
+   }
 
-      } else {
+   /**
+    * Show list of snapshots
+    */
+   getRender(){
+      if( !this.state.a.length ) return;
 
-         return `Could not restore snapshot ${number}`;
-
-      }
+      // Reduce array of snapshots into list
+      return this.state.a.reduce(
+         ( output, item, i ) => {
+            return `${ output }\n(${ i }) `
+               + `${ item.section }: ${ item.note }`;
+         },
+         `[[${ this.moduleName }]]`
+      );
    }
 
    /**
     * Assemble object representing game state
     */
-   getGameState(skipSnapshots = true){
+   getGameState( skipSelf = true ){
       const out = {};
 
       for( const module of this.game.modules ){
-         const modName = module.moduleName;
          if( !module.state ) continue;
-         if( skipSnapshots && module === this ) continue;
-         out[modName] = JSON.parse( JSON.stringify( module.state ));
+         if( skipSelf && module === this ) continue;
+         const json = JSON.stringify( module.state );
+         out[ module.moduleName ] = JSON.parse( json );
       }
 
       return out;
@@ -121,28 +120,37 @@ export default class Snapshots extends AbstractModule {
    /**
     * Restore game state from object
     */
-   restoreGameState(snapshotObj){
-      const restoredModules = [];
+   restoreGameState( snapshot ){
+
+console.log(snapshot);
+
+      const section = snapshot.section;
+      let count = 0;
 
       for( const module of this.game.modules ){
          const modName = module.moduleName;
 
-         // Check if module exists in snapshotObj
-         if( !snapshotObj[modName] ) continue;
+         // Check if module exists in snapshot
+         if( !snapshot.state[modName] ) continue;
 
-         module.state = snapshotObj[modName];
-         restoredModules.push(modName);
+         module.state = snapshot.state[modName];
+         count++;
       }
 
-      return restoredModules.length > 0;
+      if( count ){
+         return `Section ${section} snapshot restored`;
+      }
+
+      return `Could not restore snapshot`;
+
    }
 
    /**
     * Assemble JSON representing game state
     */
    getGameStateJson(){
-      const state = this.getGameState(false);
-      return JSON.stringify( state );
+      const state = this.getGameState( false );
+      return JSON.stringify( { state: state } );
    }
 
    /**
@@ -150,27 +158,27 @@ export default class Snapshots extends AbstractModule {
     */
    export( filename ){
       const json = this.getGameStateJson();
-      const fullFilename = `${filename}.json`;
+      const fullFilename = `${ filename }.json`;
 
       // Write file to disk
-      fs.writeFileSync(`./${fullFilename}`, json, 'utf8');
-      return( `Game state saved as ${fullFilename}` );
+      fs.writeFileSync( `./${ fullFilename }`, json, 'utf8' );
+      return( `Game state saved as ${ fullFilename }` );
    }
 
    /**
     * Import game state from disk
     */
    import( filename ){
-      const fullFilename = `${filename}.json`;
-      const filePath = `./${fullFilename}`;
+      const fullFilename = `${ filename }.json`;
+      const filePath = `./${ fullFilename }`;
 
       // Check if file exists
-      if ( !fs.existsSync(filePath) ) {
-         return `${fullFilename} not found`;
+      if ( !fs.existsSync( filePath )) {
+         return `${ fullFilename } not found`;
       }
 
       const json = this.fs.readFileSync( filePath, 'utf8' );
-      this.restoreGameState(JSON.parse(json));
+      this.restoreGameState( JSON.parse( json ));
       return( `${fullFilename} imported` );
    }
 
@@ -182,11 +190,12 @@ export default class Snapshots extends AbstractModule {
          ...super.getMenuOpen(),
          {
             title: "Save snapshot",
-            action: ()=>this.save()
+            action: ()=>this.add()
          }
       ];
 
-      if ( Object.keys(this.state).length ){
+      // If there are snapshots, add management options
+      if ( this.state.a.length ){
          opts.push(
             {
                title: "Restore snapshot",

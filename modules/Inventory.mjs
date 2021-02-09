@@ -24,21 +24,19 @@ export default class Inventory extends AbstractModule {
    }
 
    remove(){
-      const input = this.prompt( `Remove item #` );
-      const itemNumber = parseInt( input ) - 1;
-      const item = this.state.a[ itemNumber ];
+      const n = this.numberPrompt( `Remove item #` );
+      const item = this.state.a[ n - 1 ];
 
       if( item === undefined ) {
-         return `Item ${input} not found`;
+         return `Item ${n} not found`;
       }
 
       // Remove item
-      this.state.a = this.arrayPluck( this.state.a, itemNumber );
+      this.state.a = this.arrayPluck( this.state.a, n - 1 );
 
       // Autoclose menu item
       this.close();
-
-      return this.removed(item);
+      return this.removed( item );
    }
 
    /**
@@ -49,15 +47,15 @@ export default class Inventory extends AbstractModule {
       if( this.yesNoPrompt( `Are you sure?`) ){
          this.state.a = [];
          this.close();
-         return `${this.moduleName} cleared`;
+         return `${ this.moduleName } cleared`;
       }
 
       return `Cancelled`;
    }
 
    // To be overridden by subclass
-   added( item ){ return `${item} was added to inventory` }
-   removed( item ){ return `${item} was dropped` }
+   added( item ){ return `${ item } was added to inventory` }
+   removed( item ){ return `${ item } was dropped` }
 
    /**
     * Get view content for this module
