@@ -211,8 +211,7 @@ export default class Encounters extends AbstractModule {
 
       // Update log
       if( victor ){
-         msg = `${ loser.getName() } killed by `
-            + `${ victor.getName() } in `
+         msg = `${ loser.getName() } killed in `
             + `${ r } round${r > 1 ? 's' : ''}`;
       } else {
          msg = `Encounter with `

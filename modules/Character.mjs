@@ -200,7 +200,7 @@ export default class Character extends AbstractModule {
       if( this.isAlive() ){
          const caption = amt > 0 ?
             ` was wounded [${ amt }]`
-            : ` was healed [${ Math.asb( amt ) }]`;
+            : ` was healed [${ Math.abs( amt ) }]`;
 
          return `${ this.getName() }${ caption }!`;
       }
