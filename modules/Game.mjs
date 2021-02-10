@@ -25,7 +25,8 @@ export default class Game {
    static promptFormat = clc.xterm(45).bold;// Vivid blue
    static statusFormat = clc.xterm(190).italic;
    static indexFormat = clc.xterm(45);// Vivid blue
-   static mCountFormat = clc.xterm(243);// Light grey
+   static mCountFormat = clc.xterm(243).italic;// Light grey
+   static strikeFormat = clc.strike;
 
    constructor(){
 

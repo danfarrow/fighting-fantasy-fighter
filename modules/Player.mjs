@@ -7,38 +7,34 @@ import Game from './Game.mjs';
  * Player class
  */
 export default class Player extends Character {
+
    constructor( game ){
-      super( game );
-      this.dice = game.dice;
-      this.state.attributes.name = "Anonymous Player";
+
+      // Randomise attributes
+      const skillFunc = ()=> game.dice.roll(2) + 6;
+      const stamFunc = ()=> game.dice.roll(2) + 12
+      const luckFunc = ()=> game.dice.roll(1) + 6;
+      const goldFunc = ()=> 0;
+
+      const skill = skillFunc();
+      const stamina = stamFunc();
+      const luck = luckFunc();
+      const gold = goldFunc();
+
+      super( game, 'Anonymous Player', skill, stamina );
+
+      // Player info always displays
       this.alwaysVisible = true;
 
       // Add extra player attributes
       const a = this.state.attributes = {
          ...this.state.attributes,
-         luck: 0,
-         magic: 0,
-         gold: 10
+         luck: luck,
+         gold: gold
       }
 
-      // Store initial values of skill,
-      // stamina & luck to impose limits
-      const l = this.state.attributeLimits = {
-         skill: 0,
-         stamina: 0,
-         luck: 0
-      }
-
-      // Randomise attributes
-      const skillFunc = ()=> this.dice.roll(2) + 6;
-      const stamFunc = ()=> this.dice.roll(2) + 12
-      const luckFunc = ()=> this.dice.roll(1) + 6;
-      const magicFunc = ()=> this.dice.roll(2);
-
-      a.skill = l.skill = skillFunc();
-      a.stamina = l.stamina = stamFunc();
-      a.luck = l.luck = luckFunc();
-      a.magic = magicFunc();
+      // Add initial value for luck
+      this.state.initialValues.luck = luck;
    }
 
    /**
@@ -49,13 +45,13 @@ export default class Player extends Character {
       attr = attr.toLowerCase();
       if( !this.state.attributes[attr] ) return;
 
-      if( !this.state.attributeLimits[attr] ){
+      if( !this.state.initialValues[attr] ){
          return super.getAttrCaption( attr, capitalise );
       }
 
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       const v = this.state.attributes[attr];
-      const limit = this.state.attributeLimits[attr];
+      const limit = this.state.initialValues[attr];
       return `${ attrName } ${ Game.mCountFormat( `[${ v }/${ limit }]` ) }`;
    }
 

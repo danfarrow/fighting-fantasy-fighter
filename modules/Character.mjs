@@ -10,21 +10,25 @@ export default class Character extends AbstractModule {
    constructor( game, name, skill, stamina ){
       super( game );
 
-      // Fix circular reference error when
-      // stringifying Character instances
-      delete this.game;
+      this.dice = game.dice;
 
       this.state.attributes = {
-         name: name||"Anonymous character",
-         skill: 0,
-         stamina: 0
+         name: name || this.prompt( 'Opponent name' ),
+         skill: skill || this.numberPrompt( 'Opponent skill' ),
+         stamina: stamina || this.numberPrompt( 'Opponent stamina' )
       };
+
+      // Store initial values of skill, stamina
+      this.state.initialValues = {
+         skill: this.getAttr( 'skill' ),
+         stamina: this.getAttr( 'stamina' )
+      }
    }
 
    /**
     * Return the requested attribute
     */
-   getAttr(attr){
+   getAttr( attr ){
       attr = attr.toLowerCase();
       return this.state.attributes[ attr ];
    }
@@ -37,11 +41,14 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Return name prepended with [DEAD] if dead
+    * Return name struck out if dead
     */
    getName(){
-      const note = this.isAlive() ? '' : '[DEAD] ';
-      return note + this.getAttr( 'name' );
+      const name = this.getAttr( 'name' );
+
+      if( this.isAlive() ) return name;
+
+      return Game.strikeFormat( name );
    }
 
    /**
@@ -177,23 +184,25 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Take damage
+    * Take damage or heal (negative damage)
     */
-   damage(amt){
+   damage( amt ){
 
       this.setAttr(
          'stamina',
          this.getAttr( 'stamina' ) - amt
       );
 
-      // @todo Handle message for negative amt
       if( this.isAlive() ){
-         return `${ this.getName() } was ${ amt > 0 ? 'wounded' : 'healed' }!`;
+         const caption = amt > 0 ?
+            ` was wounded [${ amt }]`
+            : ` was healed [${ Math.asb( amt ) }]`;
+
+         return `${ this.getName() }{ caption }!`;
       }
 
-      // Check for death
+      // Character is dead
       return `${ this.getName() } is dead!`
-
    }
 
    /**

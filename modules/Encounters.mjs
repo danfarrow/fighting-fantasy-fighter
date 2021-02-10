@@ -2,6 +2,7 @@
 
 import AbstractModule from "./AbstractModule.mjs";
 import Character from "./Character.mjs";
+import Game from "./Game.mjs";
 
 /**
  * Encounter class
@@ -11,115 +12,165 @@ export default class Encounters extends AbstractModule {
       super( game );
       this.dice = game.dice;
       this.player = game.player;
-      this.state.useLuckConfig = null;
+      this.opponent;
+      this.useLuckConfig;
       this.state.history = [];
+      this.alwaysVisible = true;
    }
 
    /**
     * Begin a new encounter
     */
    start(){
+      const player = this.player;
 
-      const oName = this.prompt( 'Opponent name' );
-      const oSkill = this.numberPrompt( 'Opponent skill' );
-      const oStamina = this.numberPrompt( 'Opponent stamina' );
+      // Create opponent
+      const opponent = this.addOpponent();
+      const opponentName = opponent.getName();
 
-      const o = new Character( this.game, oName );
-      o.setAttr( 'skill', oSkill );
-      o.setAttr( 'stamina', oStamina );
-      const oAttr = o.getAttributesShort();
-
-      // Prepare encounter log object to add to history
-      const p = this.player;
-      const pName = p.getName();
-      const pAttr = p.getAttributesShort();
+      // Log entry for start of encounter
+      const title = `${ player.getName() } [${ player.getAttributesShort() }]\n`
+            + `${ opponentName } [${ opponent.getAttributesShort() }]`;
 
       this.state.log = {
-         title: `${pName} [${pAttr}]\n${oName} [${oAttr}]`,
+         title: title,
          roundCount: 0
       }
 
-      this.state.opponent = o;
+      return `Fight with ${ opponentName } started!`;
+   }
 
-      return `Encounter with ${oName} started`;
+   /**
+    * Create new opponent
+    */
+   addOpponent(){
+      this.opponent = new Character( this.game );
+
+      // Store reference to opponent state in local state
+      this.state.opponentState = this.opponent.state;
+
+      return this.opponent;
+   }
+
+   /**
+    * Restore opponent from stored state
+    */
+   restoreOpponent(){
+
+      if( !this.state.opponentState ) return;
+
+      // Instantiate opponent with copy of stored state
+      const opponent = new Character(
+         this.game,
+         this.state.opponentState.attributes.name,
+         this.state.opponentState.attributes.skill,
+         this.state.opponentState.attributes.stamina
+      );
+      // opponent.state = {...this.state.opponentState };
+
+      // Now overwrite local state with opponent's state obj
+      this.state.opponentState = {...opponent.state};
+      return opponent;
+   }
+
+   /**
+    * Return opponent or instantiate from this.state
+    */
+   getOpponent(){
+      if( !this.opponent ){
+
+         // Attempt to restore from stored state
+         const opponent = this.restoreOpponent();
+         if( !opponent ) return;
+
+         this.opponent = opponent;
+      }
+
+      return this.opponent;
    }
 
    /**
     * Fight round
     *
-    * @todo This is a bit monolithic
+    * @todo Still quite monolithic
     */
    attack(){
       // Increment roundCount in log
       this.state.log.roundCount++;
 
-      const o = this.state.opponent;
-      const oName = o.getName();
-      const p = this.player;
-      const pName = p.getName();
+      const player = this.player;
+      const playerName = player.getName();
+      const opponent = this.getOpponent();
+      const opponentName = opponent.getName();
 
-      // Calculate attack strengths (2 dice + skill)
+      // Roll 2 dice per participant
+      // Check for instant death!
       const roll = this.dice.combatRoll( 2 );
-      const playerAS = p.getAttackStrength( roll[0] + roll[1] );
-      const opponentAS = o.getAttackStrength( roll[2] + roll[3] );
-
-      // Check for double roll / instant death!
       const instantDeath = roll[0] === roll[1];
+
+      // Get attack strengths
+      const playerAS = player.getAttackStrength( roll[0] + roll[1] );
+      const opponentAS = opponent.getAttackStrength( roll[2] + roll[3] );
 
       // Damage amount
       const damage = 2;
 
+      // Add attacks to output
       const out = [
-         `${pName} attack: ${playerAS}`,
-         `${oName} attack: ${opponentAS}`
+         `${ playerName } attack: ${ playerAS }`,
+         `${ opponentName } attack: ${ opponentAS }`
       ];
 
-      const diff = playerAS - opponentAS;
-
-      if( diff < 0 && !instantDeath ){
+      if( playerAS < opponentAS && !instantDeath ){
 
          // Player was wounded
-         out.push( p.damage( damage ));
+         out.push( player.damage( damage ));
 
-         // Use luck? Damage = lucky ? 1 : 3
-         this.state.useLuckConfig = {
-            title: "Use luck to reduce injury",
-            lucky: ()=> p.damage( -1 ),
-            unlucky: ()=> p.damage( 1 )
+         // Set 'use luck' functions
+         // @todo Store in var
+         this.useLuckConfig = {
+            title: 'Use luck to reduce injury',
+            lucky: ()=> player.damage( -1 ),
+            unlucky: ()=> player.damage( 1 )
          };
 
          // Player died
-         if( !p.isAlive() ){
-            return this.end( o, p );
+         if( !player.isAlive() ){
+            return this.end( opponent, player );
          }
 
-      } else if( diff > 0  || instantDeath ){
+      } else if( playerAS > opponentAS  || instantDeath ){
 
          // Opponent was wounded
-         out.push( o.damage( instantDeath ? o.getAttr( 'stamina' ) : damage ));
+         // Instant Death removes all stamina
+         out.push(
+            opponent.damage(
+               instantDeath ? opponent.getAttr( 'stamina' ) : damage
+            )
+         );
 
-         // Use luck? damage = lucky ? 4 : 1
-         this.state.useLuckConfig = {
+         // Set 'use luck' functions
+         // @todo Store in var
+         this.useLuckConfig = {
             title: "Use luck to increase damage",
-            lucky: ()=> o.damage( 2 ),
-            unlucky: ()=> o.damage( -1 )
+            lucky: ()=> opponent.damage( 2 ),
+            unlucky: ()=> opponent.damage( -1 )
          };
 
          // Opponent died
-         if( !o.isAlive() ) {
-
-            // Replace `[opponent] wounded!` message
-            out.pop();
-            out.push( `You killed ${oName}!` );
-
-            return this.end( p, o, instantDeath );
+         if( !opponent.isAlive() ) {
+            return this.end( player, opponent, instantDeath );
          }
 
       } else {
+
          // Nobody wounded
          out.push( `Miss!` );
+
       };
 
+      // Resync plain object in state
+// this.state.opponentState = { ...this.opponent.state };
       return out.join( `\n` );
    }
 
@@ -127,29 +178,34 @@ export default class Encounters extends AbstractModule {
     * Execute damage adjustment function based on luck
     */
    useLuck(){
+
+      if( !this.useLuckConfig ) return;
+
+      // Copy luck config
+      const luckConfig = this.useLuckConfig;
+      this.useLuckConfig = null;
+
       // Get boolean luck test result
       const lucky = this.player.testLuck(true);
       const ascii = this.player.getLuckAscii(lucky);
 
       if(lucky) {
          return `${ascii}\n`
-            + this.state.useLuckConfig.lucky();
+            + luckConfig.lucky();
       } else {
          return `${ascii}\n`
-            + this.state.useLuckConfig.unlucky();
+            + luckConfig.unlucky();
       }
 
-      this.state.useLuckConfig = null;
    }
 
    /**
     * Render view
     */
    getRender(){
-      const o = this.state.opponent;
-      if( !o ) return;
-
-      return o.getFightStatusArr().join( `\n` );
+      const opponent = this.getOpponent();
+      if( !opponent ) return;
+      return opponent.getFightStatusArr().join( `\n` );
    }
 
    /**
@@ -157,6 +213,7 @@ export default class Encounters extends AbstractModule {
     */
    end( victor, loser, instantDeath = false ){
       const r = this.state.log.roundCount;
+      const opponent = this.getOpponent();
       let msg;
 
       // Update log
@@ -166,7 +223,7 @@ export default class Encounters extends AbstractModule {
             + `${ r } round${r > 1 ? 's' : ''}`;
       } else {
          msg = `Encounter with `
-            + this.state.opponent.getName()
+            + opponent.getName()
             + ` ended` ;
       }
 
@@ -174,15 +231,13 @@ export default class Encounters extends AbstractModule {
       this.state.log.outcome = msg;
       this.state.history.push( this.state.log );
 
-      // Reset
-      delete this.state.log;
-      delete this.state.useLuckConfig;
-      delete this.state.opponent;
+      // Reset all state except history
+      this.state = { history: this.state.history }
+      delete this.opponent;
 
-      // Close
       this.close();
-
       return msg;
+
    }
 
    /**
@@ -204,12 +259,12 @@ export default class Encounters extends AbstractModule {
     * show opponent name in menu
     */
    getMenuClosed(){
-      const o = this.state.opponent;
+      const opponent = this.getOpponent();
       const out = [];
 
       out.push(
-         o ? {
-               title: `Encounter [${o.getName()}]…`,
+         opponent ? {
+               title: `Encounter ${ Game.mCountFormat( `[${ opponent.getName() }]` ) }…`,
                action: ()=>this.open()
             }
          :{
@@ -226,14 +281,13 @@ export default class Encounters extends AbstractModule {
     */
    getMenuOpen(){
 
-      const p = this.player;
       const canUseLuck = this.player.getAttr( 'luck' ) > 0;
-      const o = this.state.opponent;
+      const opponent = this.getOpponent();
       const opts = [ ...super.getMenuOpen() ];
 
       // Menu differs depending on whether an
       // encounter is in progress
-      if( !o ){
+      if( !opponent ){
          opts.push(
             {
                title: `Start encounter`,
@@ -258,15 +312,15 @@ export default class Encounters extends AbstractModule {
          // & opponent attribute menu items
          opts.push(
             {
-               title: `Attack ${o.getName()}`,
+               title: `Attack ${ opponent.getName() }`,
                action: ()=>this.attack()
             }
          )
 
-         if( this.state.useLuckConfig && canUseLuck ){
+         if( this.useLuckConfig && canUseLuck ){
             opts.push(
                {
-                  title: this.state.useLuckConfig.title,
+                  title: this.useLuckConfig.title,
                   action: ()=>this.useLuck()
                }
             )
@@ -280,7 +334,7 @@ export default class Encounters extends AbstractModule {
          );
 
          // Add opponent character menu
-         const oppMenu = o.getMenuOpen();
+         const oppMenu = opponent.getMenuOpen();
          oppMenu.shift();// HACK Remove [close menu]
          opts.push(...oppMenu);
 
