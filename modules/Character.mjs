@@ -10,8 +10,6 @@ export default class Character extends AbstractModule {
    constructor( game, name, skill, stamina ){
       super( game );
 
-      this.dice = game.dice;
-
       this.state.attributes = {
          name: name || this.prompt( 'Opponent name' ),
          skill: skill || this.numberPrompt( 'Opponent skill' ),
@@ -23,6 +21,12 @@ export default class Character extends AbstractModule {
          skill: this.getAttr( 'skill' ),
          stamina: this.getAttr( 'stamina' )
       }
+
+      // Status buffer for transient messages
+      this.status = [];
+
+      // Formatting for dice ASCII
+      this.diceFormat = Game.diceFormatOpponent;
    }
 
    /**
@@ -63,6 +67,7 @@ export default class Character extends AbstractModule {
       attr = attr.toLowerCase();
 
       if( 'name' !== attr ){
+
          // Numeric attribute values cannot be negative
          value = Math.max( value, 0 );
       }
@@ -89,7 +94,7 @@ export default class Character extends AbstractModule {
    getAttrCaption( attr, capitalise = false ){
 
       attr = attr.toLowerCase();
-      if( !this.state.attributes[attr] ) return;
+      if( !this.state.attributes[ attr ] ) return;
 
       const attrValue = this.state.attributes[attr];
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
@@ -122,19 +127,20 @@ export default class Character extends AbstractModule {
     * Return full text for character attributes
     */
    getRender(){
-      const out = [];
-
-      // Display attributes in full format:
-      // Skill: 10
-      // Stamina: 19
-      // etc.
-      for(let attr in this.state.attributes){
-         out.push(
-            `${this.capitaliseFirst(attr)}: ${this.state.attributes[attr]}`
-         );
-      };
+      // Add any extra status messages & clear status
+      const out = [...this.getFightStatusArr(), ...this.status];
+      this.status = [];
 
       return out.join(`\n`);
+   }
+
+   /**
+    * Roll 2 dice for this character
+    */
+   rollDice(){
+      const dice = [ this.game.dice.roll(1), this.game.dice.roll(1) ];
+      this.status.push( this.game.dice.getAscii( dice, this.diceFormat ));
+      return dice.reduce(( t, n ) => t + n );
    }
 
    /**
@@ -164,18 +170,16 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Return short status text
-    */
-   getFightStatus(){
-      return this.getFightStatusArr().join( `\n` );
-   }
-
-   /**
     * Return array of lines for fight status
     */
    getFightStatusArr(){
+      const stamina = this.getAttr( 'stamina' );
+      const staminaInitial = this.state.initialValues.stamina;
+      const staminaLost = Math.max( staminaInitial - stamina, 0 );
+
+      const staminaString = this.diceFormat( "♥ ".repeat( stamina ) )
+         + Game.mCountFormat( "♡ ".repeat( staminaLost ) );
       const skillString = "⚔ ".repeat( this.getAttr( 'skill' ));
-      const staminaString = "♥ ".repeat( this.getAttr( 'stamina' ));
 
       const out = [ `[[${ this.getName() }]]${ skillString}` ];
       out.push( staminaString );
@@ -198,7 +202,7 @@ export default class Character extends AbstractModule {
             ` was wounded [${ amt }]`
             : ` was healed [${ Math.asb( amt ) }]`;
 
-         return `${ this.getName() }{ caption }!`;
+         return `${ this.getName() }${ caption }!`;
       }
 
       // Character is dead

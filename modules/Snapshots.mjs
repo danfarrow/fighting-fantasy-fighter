@@ -55,17 +55,19 @@ export default class Snapshots extends AbstractModule {
    // @todo Overridden from superclass
    added( item ){ return `Section ${ item } snapshot saved` };
    removed( item ){ return `Section ${ item } snapshot removed`; }
+
    /**
     * Remove all items
     */
    removeAll(){
-      if( this.yesNoPrompt( `Are you sure?`) ){
-         this.state.a = [];
-         this.close();
-         return `${ this.moduleName } cleared`;
+
+      if( !this.yesNoPrompt( `Are you sure?` )){
+         return `Cancelled`;
       }
 
-      return `Cancelled`;
+      this.state.a = [];
+      this.close();
+      return `${ this.moduleName } cleared`;
    }
 
    /**

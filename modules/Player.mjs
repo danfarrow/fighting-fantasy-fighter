@@ -35,6 +35,9 @@ export default class Player extends Character {
 
       // Add initial value for luck
       this.state.initialValues.luck = luck;
+
+      // Formatting for dice ASCII
+      this.diceFormat = Game.diceFormat;
    }
 
    /**
@@ -58,22 +61,25 @@ export default class Player extends Character {
    /**
     * Test player's luck & reduce luck attribute by 1
     */
-   testLuck(returnBool = false){
+   testLuck( returnBool = false ){
 
       const out = [];
-      let lucky;
+      let lucky = false;
 
       if( this.state.attributes.luck < 1 ) {
+
          lucky = false;
          out.push( "No luck points" );
+
       } else {
-         const diceResult = this.dice.rollVisible( 2 );
-         lucky = diceResult <= this.state.attributes.luck;
+
+         const diceValue = this.rollDice();
+         lucky = diceValue <= this.state.attributes.luck;
          this.setAttr( 'luck', this.getAttr( 'luck' ) - 1 );
+
       }
 
-      out.push( lucky ? 'LUCKY!' : 'UNLUCKY!' );
-
+      out.push( lucky ? 'Lucky!' : 'Unlucky!' );
       return returnBool ? lucky : out.join( `\n` );
    }
 
@@ -119,10 +125,13 @@ export default class Player extends Character {
          )
       };
 
-      return menu;
-   }
+      menu.push(
+         {
+            title: `Roll dice`,
+            action: ()=> `You rolled ${ this.rollDice() }`
+         }
+      );
 
-   getRender(){
-      return this.isMenuOpen ? super.getRender() : this.getFightStatus()
+      return menu;
    }
 }

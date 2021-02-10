@@ -29,8 +29,9 @@ export default class Encounters extends AbstractModule {
       const opponentName = opponent.getName();
 
       // Log entry for start of encounter
-      const title = `${ player.getName() } [${ player.getAttributesShort() }]\n`
-            + `${ opponentName } [${ opponent.getAttributesShort() }]`;
+      const title =
+         `${ player.getName() } [${ player.getAttributesShort() }]\n`
+         + `${ opponentName } [${ opponent.getAttributesShort() }]`;
 
       this.state.log = {
          title: title,
@@ -104,13 +105,13 @@ export default class Encounters extends AbstractModule {
       const opponentName = opponent.getName();
 
       // Roll 2 dice per participant
-      // Check for instant death!
-      const roll = this.dice.combatRoll( 2 );
-      const instantDeath = roll[0] === roll[1];
+      // @todo Check for instant death
 
       // Get attack strengths
-      const playerAS = player.getAttackStrength( roll[0] + roll[1] );
-      const opponentAS = opponent.getAttackStrength( roll[2] + roll[3] );
+      // @todo Move this into player object
+      //     so player can check for instant death
+      const playerAS = player.getAttackStrength( player.rollDice() );
+      const opponentAS = opponent.getAttackStrength( opponent.rollDice() );
 
       // Damage amount
       const damage = 2;
@@ -121,13 +122,12 @@ export default class Encounters extends AbstractModule {
          `${ opponentName } attack: ${ opponentAS }`
       ];
 
-      if( playerAS < opponentAS && !instantDeath ){
+      if( playerAS < opponentAS ){
 
          // Player was wounded
          out.push( player.damage( damage ));
 
          // Set 'use luck' functions
-         // @todo Store in var
          this.useLuckConfig = {
             title: 'Use luck to reduce injury',
             lucky: ()=> player.damage( -1 ),
@@ -139,18 +139,13 @@ export default class Encounters extends AbstractModule {
             return this.end( opponent, player );
          }
 
-      } else if( playerAS > opponentAS  || instantDeath ){
+      } else if( playerAS > opponentAS ){
 
          // Opponent was wounded
          // Instant Death removes all stamina
-         out.push(
-            opponent.damage(
-               instantDeath ? opponent.getAttr( 'stamina' ) : damage
-            )
-         );
+         out.push( opponent.damage( damage ) );
 
          // Set 'use luck' functions
-         // @todo Store in var
          this.useLuckConfig = {
             title: "Use luck to increase damage",
             lucky: ()=> opponent.damage( 2 ),
@@ -159,7 +154,7 @@ export default class Encounters extends AbstractModule {
 
          // Opponent died
          if( !opponent.isAlive() ) {
-            return this.end( player, opponent, instantDeath );
+            return this.end( player, opponent );
          }
 
       } else {
@@ -169,8 +164,6 @@ export default class Encounters extends AbstractModule {
 
       };
 
-      // Resync plain object in state
-// this.state.opponentState = { ...this.opponent.state };
       return out.join( `\n` );
    }
 
@@ -205,13 +198,13 @@ export default class Encounters extends AbstractModule {
    getRender(){
       const opponent = this.getOpponent();
       if( !opponent ) return;
-      return opponent.getFightStatusArr().join( `\n` );
+      return opponent.getRender();
    }
 
    /**
     * Finish the current encounter & close menu
     */
-   end( victor, loser, instantDeath = false ){
+   end( victor, loser ){
       const r = this.state.log.roundCount;
       const opponent = this.getOpponent();
       let msg;

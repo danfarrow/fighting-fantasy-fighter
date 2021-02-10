@@ -39,23 +39,23 @@ export default class Inventory extends AbstractModule {
       return this.removed( item );
    }
 
+   // To be overridden by subclass
+   added( item ){ return `${ item } was added to inventory` }
+   removed( item ){ return `${ item } was dropped` }
+
    /**
     * Remove all items
     */
    removeAll(){
 
-      if( this.yesNoPrompt( `Are you sure?`) ){
-         this.state.a = [];
-         this.close();
-         return `${ this.moduleName } cleared`;
+      if( !this.yesNoPrompt( `Are you sure?`) ){
+         return `Cancelled`;
       }
 
-      return `Cancelled`;
+      this.state.a = [];
+      this.close();
+      return `${ this.moduleName } cleared`;
    }
-
-   // To be overridden by subclass
-   added( item ){ return `${ item } was added to inventory` }
-   removed( item ){ return `${ item } was dropped` }
 
    /**
     * Get view content for this module
