@@ -180,13 +180,13 @@ export default class Encounters extends AbstractModule {
 
       // Get boolean luck test result
       const lucky = this.player.testLuck(true);
-      const ascii = this.player.getLuckAscii(lucky);
+      const ascii = this.player.getLuckAscii( lucky );
 
-      if(lucky) {
-         return `${ascii}\n`
+      if( lucky ) {
+         return `${ ascii }\n`
             + luckConfig.lucky();
       } else {
-         return `${ascii}\n`
+         return `${ ascii }\n`
             + luckConfig.unlucky();
       }
 
