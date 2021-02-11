@@ -254,12 +254,21 @@ export default class Encounters extends AbstractModule {
       const opponent = this.getOpponent();
       const out = [];
 
-      out.push(
-         opponent ? {
-               title: `Encounter ${ Game.mCountFormat( `[${ opponent.getName() }]` ) }…`,
-               action: ()=>this.open()
-            }
-         :{
+      opponent ? out.push(
+         {
+            title: `Attack ${ opponent.getName() }`,
+            action: ()=>this.attack()
+         },
+         {
+            title: `Encounter…`,
+            action: ()=>this.open()
+         }
+      ) : out.push(
+         {
+            title: `New encounter`,
+            action: ()=>this.start()
+         },
+         {
             title: `Encounter…`,
             action: ()=>this.open()
          }

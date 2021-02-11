@@ -18,8 +18,8 @@ export default class Game {
    static colWidth = 60;// Set width for centering / padding
    static headerFormat = clc.xterm(116).bgXterm(31).bold;// Turquoise on blue
    static dividerFormat = clc.xterm(190);// Lime green
-   static diceFormat = clc.xterm(190);// Lime green
-   static diceFormatOpponent = clc.xterm(127);// Soft purple
+   static diceFormat = clc.xterm(198);//
+   static diceFormatOpponent = clc.xterm(190);// Lime green
    static healthFormat = clc.xterm(197);// Soft red
    static healthFormatOpponent = clc.xterm(127);// Soft purple
    static promptFormat = clc.xterm(45).bold;// Vivid blue
