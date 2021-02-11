@@ -113,6 +113,15 @@ export default class Player extends Character {
 
    getMenu( menu ){
 
+      const stamina = this.getAttr( 'stamina' );
+
+      menu.push(
+         {
+            title: `Roll dice`,
+            action: ()=> `You rolled ${ this.rollDice() }`
+         }
+      );
+
       if( this.getAttr('luck') > 0 ){
          const luck = this.getAttr('luck');
          const luckCount = Game.mCountFormat( `[${ luck }]` );
@@ -124,13 +133,6 @@ export default class Player extends Character {
             }
          )
       };
-
-      menu.push(
-         {
-            title: `Roll dice`,
-            action: ()=> `You rolled ${ this.rollDice() }`
-         }
-      );
 
       return menu;
    }
