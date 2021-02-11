@@ -173,15 +173,16 @@ export default class Character extends AbstractModule {
     * Return array of lines for fight status
     */
    getFightStatusArr(){
+      const skill = this.getAttr( 'skill' );
       const stamina = this.getAttr( 'stamina' );
       const staminaInitial = this.state.initialValues.stamina;
       const staminaLost = Math.max( staminaInitial - stamina, 0 );
 
-      const staminaString = this.diceFormat( "♥ ".repeat( stamina ) )
-         + Game.mCountFormat( "♡ ".repeat( staminaLost ) );
-      const skillString = "⚔ ".repeat( this.getAttr( 'skill' ));
+      const staminaString = this.diceFormat( "♥ ".repeat( stamina ))
+         + Game.mCountFormat( "♡ ".repeat( staminaLost ));
+      const skillString = this.diceFormat( "⚔ ".repeat( skill ));
 
-      const out = [ `[[${ this.getName() }]]${ skillString}` ];
+      const out = [ `[[${ this.getName() }]]${ skillString }` ];
       out.push( staminaString );
 
       return out;

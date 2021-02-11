@@ -150,7 +150,7 @@ export default class AbstractModule {
    getMenuOpen(){
       return [
          {
-            title: `${this.moduleName} ${Game.indexFormat(`⊗`)}`,
+            title: `${ Game.dividerFormat( this.moduleName ) } ${ Game.indexFormat(`⊗`) }`,
             action: ()=>this.close()
          }
       ]
