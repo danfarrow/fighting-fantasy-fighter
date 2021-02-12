@@ -260,16 +260,16 @@ export default class Encounters extends AbstractModule {
             action: ()=>this.attack()
          },
          {
-            title: `Encounter…`,
+            title: `Encounters…`,
             action: ()=>this.open()
          }
       ) : out.push(
          {
-            title: `New encounter`,
+            title: `Start encounter`,
             action: ()=>this.start()
          },
          {
-            title: `Encounter…`,
+            title: `Encounters…`,
             action: ()=>this.open()
          }
       );
@@ -302,7 +302,7 @@ export default class Encounters extends AbstractModule {
             opts.push(
                {
                   title: `Encounter history`,
-                  action: ()=>this.history()
+                  action: ()=> this.history()
                }
             );
          }
@@ -314,7 +314,7 @@ export default class Encounters extends AbstractModule {
          opts.push(
             {
                title: `Attack ${ opponent.getName() }`,
-               action: ()=>this.attack()
+               action: ()=> this.attack()
             }
          )
 
@@ -322,7 +322,7 @@ export default class Encounters extends AbstractModule {
             opts.push(
                {
                   title: this.useLuckConfig.title,
-                  action: ()=>this.useLuck()
+                  action: ()=> this.useLuck()
                }
             )
          }
@@ -336,7 +336,7 @@ export default class Encounters extends AbstractModule {
 
          // Add opponent character menu
          const oppMenu = opponent.getMenuOpen();
-         oppMenu.shift();// HACK Remove [close menu]
+         oppMenu.shift();// HACK Remove opponent's [close menu]
          opts.push(...oppMenu);
 
       }

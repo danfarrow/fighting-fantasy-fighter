@@ -94,9 +94,11 @@ export default class Character extends AbstractModule {
    getAttrCaption( attr, capitalise = false ){
 
       attr = attr.toLowerCase();
-      if( !this.state.attributes[ attr ] ) return;
 
-      const attrValue = this.state.attributes[attr];
+      // Check for attribute in state, whilst respecting zero values
+      if( !Object.keys( this.state.attributes ).includes( attr ) ) return;
+
+      const attrValue = this.state.attributes[ attr ];
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       return `${ attrName } ${ Game.lowKeyFormat( `[${ attrValue }]` )}`;
    }
@@ -127,20 +129,25 @@ export default class Character extends AbstractModule {
     * Return full text for character attributes
     */
    getRender(){
+      const skill = this.getAttr( 'skill' );
+      const stamina = this.getAttr( 'stamina' );
+      const stamInit = this.state.initialValues.stamina;
+      const stamLost = Math.max( stamInit - stamina, 0 );
+
+      const staminaString = this.format( "♥ ".repeat( stamina ))
+         + Game.lowKeyFormat( "♡ ".repeat( stamLost ));
+
+      const skillString = this.format( "⚔ ".repeat( skill ));
+
+      const out = [ `[[${ this.getName() }]]${ skillString }` ];
+      out.push( staminaString );
+
+
       // Add any extra status messages & clear status
-      const out = [...this.getFightStatusArr(), ...this.status];
+      out.push( ...this.status );
       this.status = [];
 
       return out.join(`\n`);
-   }
-
-   /**
-    * Roll 2 dice for this character
-    */
-   rollDice(){
-      const dice = [ this.game.dice.roll(1), this.game.dice.roll(1) ];
-      this.status.push( this.game.dice.getAscii( dice, this.diceFormat ));
-      return dice.reduce(( t, n ) => t + n );
    }
 
    /**
@@ -163,29 +170,19 @@ export default class Character extends AbstractModule {
    }
 
    /**
+    * Roll 2 dice for this character
+    */
+   rollDice(){
+      const dice = [ this.game.dice.roll(1), this.game.dice.roll(1) ];
+      this.status.push( this.game.dice.getAscii( dice, this.format ));
+      return dice.reduce(( t, n ) => t + n );
+   }
+
+   /**
     * Return attack strength (2 dice + skill)
     */
    getAttackStrength( diceRoll ){
       return diceRoll + this.getAttr( 'skill' );
-   }
-
-   /**
-    * Return array of lines for fight status
-    */
-   getFightStatusArr(){
-      const skill = this.getAttr( 'skill' );
-      const stamina = this.getAttr( 'stamina' );
-      const staminaInitial = this.state.initialValues.stamina;
-      const staminaLost = Math.max( staminaInitial - stamina, 0 );
-
-      const staminaString = this.diceFormat( "♥ ".repeat( stamina ))
-         + Game.mCountFormat( "♡ ".repeat( staminaLost ));
-      const skillString = this.diceFormat( "⚔ ".repeat( skill ));
-
-      const out = [ `[[${ this.getName() }]]${ skillString }` ];
-      out.push( staminaString );
-
-      return out;
    }
 
    /**

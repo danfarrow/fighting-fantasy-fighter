@@ -41,12 +41,14 @@ export default class Player extends Character {
    }
 
    /**
-    * Return attribute Name [value/limit]
+    * Return attribute in player format `Name [value/initial]`
     */
    getAttrCaption( attr, capitalise = false ){
 
       attr = attr.toLowerCase();
-      if( !this.state.attributes[attr] ) return;
+
+      // Check for attribute in state, whilst respecting zero values
+      if( !Object.keys(this.state.attributes).includes( attr ) ) return;
 
       if( !this.state.initialValues[attr] ){
          return super.getAttrCaption( attr, capitalise );
