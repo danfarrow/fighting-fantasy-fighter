@@ -16,17 +16,17 @@ import Encounters from "./Encounters.mjs";
 export default class Game {
 
    static colWidth = 60;// Set width for centering / padding
-   static headerFormat = clc.xterm(116).bgXterm(31).bold;// Turquoise on blue
-   static dividerFormat = clc.xterm(190);// Lime green
-   static diceFormat = clc.xterm(198);//
-   static diceFormatOpponent = clc.xterm(190);// Lime green
-   static healthFormat = clc.xterm(197);// Soft red
-   static healthFormatOpponent = clc.xterm(127);// Soft purple
-   static promptFormat = clc.xterm(45).bold;// Vivid blue
-   static statusFormat = clc.xterm(190).italic;
-   static indexFormat = clc.xterm(45);// Vivid blue
-   static mCountFormat = clc.xterm(243).italic;// Light grey
+
+   // Colour reference is here https://www.npmjs.com/package/cli-color
    static strikeFormat = clc.strike;
+   static moduleTitleFormat = clc.xterm(116).bgXterm(31).bold;// Turquoise on blue
+   static lowKeyFormat = clc.xterm(243).italic;// Light grey
+   static highKeyFormat = clc.xterm(190);// Lime green
+   static statusFormat = clc.xterm(190).italic;// Lime green
+   static opponentFormat = clc.xterm(190);// Lime green
+   static playerFormat = clc.xterm(198);// Pinky red
+   static promptFormat = clc.xterm(45).bold;// Vivid blue
+   static menuIndexFormat = clc.xterm(45);// Vivid blue
 
    constructor(){
 
@@ -174,18 +174,18 @@ export default class Game {
          /(\(([\d]+)\))/g,
          (match, p1, p2) => {
             const symbol = nums[parseInt( p2 )];
-            return Game.indexFormat( symbol ) + ' ';
+            return Game.menuIndexFormat( symbol ) + ' ';
          }
       );
    }
 
    /**
-    * Replace `[[Header]]` with `Game.headerFormat('Header')`
+    * Replace `[[Header]]` with `Game.moduleTitleFormat('Header')`
     */
    fancyHeaders( str ){
       return str.replace(
          /\[\[(.*)\]\]/g,
-         (match, p1) => Game.headerFormat( ` ${ p1 } ` ) + `\n`
+         (match, p1) => Game.moduleTitleFormat( ` ${ p1 } ` ) + `\n`
       );
    }
 

@@ -78,7 +78,7 @@ export default class Dice extends AbstractModule {
    /**
     * Render supplied numbers as ascii dice
     */
-   getAscii( numbers, format = Game.diceFormat ){
+   getAscii( numbers, format = Game.playerFormat ){
       let asciiArr;
 
       for(let i of numbers){

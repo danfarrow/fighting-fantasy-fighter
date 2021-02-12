@@ -25,8 +25,8 @@ export default class Character extends AbstractModule {
       // Status buffer for transient messages
       this.status = [];
 
-      // Formatting for dice ASCII
-      this.diceFormat = Game.diceFormatOpponent;
+      // Formatting for title, attribute bars, dice ASCII
+      this.format = Game.opponentFormat;
    }
 
    /**
@@ -98,7 +98,7 @@ export default class Character extends AbstractModule {
 
       const attrValue = this.state.attributes[attr];
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
-      return `${ attrName } ${ Game.mCountFormat( `[${ attrValue }]` )}`;
+      return `${ attrName } ${ Game.lowKeyFormat( `[${ attrValue }]` )}`;
    }
 
    /**

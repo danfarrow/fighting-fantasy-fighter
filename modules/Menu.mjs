@@ -34,7 +34,7 @@ export default class Menu {
          out += `(${i}) ${opt.title}\n`;
 
       return config.reduce( reducer, `[[Menu]]\n` )
-         + `${Game.indexFormat('Ⓠ')}  Quit (with autosave)`;
+         + `${Game.menuIndexFormat('Ⓠ')}  Quit (with autosave)`;
    }
 
    /**

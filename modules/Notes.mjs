@@ -17,7 +17,7 @@ export default class Notes extends Inventory {
    getMenuOpen(){
       const opts = [
          {
-            title: `${this.moduleName} ${ Game.indexFormat(`×`) }`, //[⊗]`,
+            title: `${this.moduleName} ${ Game.menuIndexFormat(`×`) }`,
             action: ()=>this.close()
          },
          {

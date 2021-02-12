@@ -36,8 +36,8 @@ export default class Player extends Character {
       // Add initial value for luck
       this.state.initialValues.luck = luck;
 
-      // Formatting for dice ASCII
-      this.diceFormat = Game.diceFormat;
+      // Formatting for title, attribute bars, dice ASCII
+      this.format = Game.playerFormat;
    }
 
    /**
@@ -55,7 +55,7 @@ export default class Player extends Character {
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       const v = this.state.attributes[attr];
       const limit = this.state.initialValues[attr];
-      return `${ attrName } ${ Game.mCountFormat( `[${ v }/${ limit }]` ) }`;
+      return `${ attrName } ${ Game.lowKeyFormat( `[${ v }/${ limit }]` ) }`;
    }
 
    /**
@@ -124,7 +124,7 @@ export default class Player extends Character {
 
       if( this.getAttr('luck') > 0 ){
          const luck = this.getAttr('luck');
-         const luckCount = Game.mCountFormat( `[${ luck }]` );
+         const luckCount = Game.lowKeyFormat( `[${ luck }]` );
 
          menu.push(
             {
