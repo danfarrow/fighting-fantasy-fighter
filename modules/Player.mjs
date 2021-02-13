@@ -41,6 +41,58 @@ export default class Player extends Character {
    }
 
    /**
+    * Add opponent
+    */
+   addOpponent(){
+
+      const opponent = new Character( this.game );
+
+      this.opponent = opponent;
+
+      // Store reference to opponent state in local state
+      this.state.opponentState = this.opponent.state;
+
+      return opponent;
+   }
+
+   /**
+    * Return opponent or instantiate from this.state
+    */
+   getOpponent(){
+      if( !this.opponent ){
+
+         // Attempt to restore from stored state
+         const opponent = this.restoreOpponent();
+         if( !opponent ) return;
+
+         this.opponent = opponent;
+      }
+
+      return this.opponent;
+   }
+
+   /**
+    * Restore opponent from stored state
+    */
+   restoreOpponent(){
+
+      if( !this.state.opponentState ) return;
+
+      // Instantiate opponent with copy of stored state
+      const opponent = new Character(
+         this.game,
+         this.state.opponentState.attributes.name,
+         this.state.opponentState.attributes.skill,
+         this.state.opponentState.attributes.stamina
+      );
+      // opponent.state = {...this.state.opponentState };
+
+      // Now overwrite local state with opponent's state obj
+      this.state.opponentState = {...opponent.state};
+      return opponent;
+   }
+
+   /**
     * Return attribute in player format `Name [value/initial]`
     */
    getAttrCaption( attr, capitalise = false ){
@@ -137,5 +189,18 @@ export default class Player extends Character {
       };
 
       return menu;
+   }
+
+   /**
+    * Display opponent stats if applicable
+    */
+   getRender(){
+      const opponent = this.getOpponent();
+      if( !opponent ) return super.getRender();
+
+      // Clear dead opponent
+      if( !opponent.isAlive() ) delete this.opponent;
+
+      return `${ super.getRender() }\n\n${ opponent.getRender() }`;
    }
 }

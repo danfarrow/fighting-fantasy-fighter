@@ -135,7 +135,7 @@ export default class Character extends AbstractModule {
       const stamLost = Math.max( stamInit - stamina, 0 );
 
       const staminaString = this.format( "♥ ".repeat( stamina ))
-         + Game.lowKeyFormat( "♡ ".repeat( stamLost ));
+         + "♡ ".repeat( stamLost );
 
       const skillString = this.format( "⚔ ".repeat( skill ));
 

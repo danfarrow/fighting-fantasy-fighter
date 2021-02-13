@@ -25,7 +25,7 @@ export default class Encounters extends AbstractModule {
       const player = this.player;
 
       // Create opponent
-      const opponent = this.addOpponent();
+      const opponent = this.player.addOpponent();
       const opponentName = opponent.getName();
 
       // Log entry for start of encounter
@@ -42,55 +42,6 @@ export default class Encounters extends AbstractModule {
    }
 
    /**
-    * Create new opponent
-    */
-   addOpponent(){
-      this.opponent = new Character( this.game );
-
-      // Store reference to opponent state in local state
-      this.state.opponentState = this.opponent.state;
-
-      return this.opponent;
-   }
-
-   /**
-    * Restore opponent from stored state
-    */
-   restoreOpponent(){
-
-      if( !this.state.opponentState ) return;
-
-      // Instantiate opponent with copy of stored state
-      const opponent = new Character(
-         this.game,
-         this.state.opponentState.attributes.name,
-         this.state.opponentState.attributes.skill,
-         this.state.opponentState.attributes.stamina
-      );
-      // opponent.state = {...this.state.opponentState };
-
-      // Now overwrite local state with opponent's state obj
-      this.state.opponentState = {...opponent.state};
-      return opponent;
-   }
-
-   /**
-    * Return opponent or instantiate from this.state
-    */
-   getOpponent(){
-      if( !this.opponent ){
-
-         // Attempt to restore from stored state
-         const opponent = this.restoreOpponent();
-         if( !opponent ) return;
-
-         this.opponent = opponent;
-      }
-
-      return this.opponent;
-   }
-
-   /**
     * Fight round
     *
     * @todo Still quite monolithic
@@ -101,7 +52,7 @@ export default class Encounters extends AbstractModule {
 
       const player = this.player;
       const playerName = player.getName();
-      const opponent = this.getOpponent();
+      const opponent = this.player.getOpponent();
       const opponentName = opponent.getName();
 
       // Roll 2 dice per participant
@@ -193,20 +144,11 @@ export default class Encounters extends AbstractModule {
    }
 
    /**
-    * Render view
-    */
-   getRender(){
-      const opponent = this.getOpponent();
-      if( !opponent ) return;
-      return opponent.getRender();
-   }
-
-   /**
     * Finish the current encounter & close menu
     */
    end( victor, loser ){
       const r = this.state.log.roundCount;
-      const opponent = this.getOpponent();
+      const opponent = this.player.getOpponent();
       let msg;
 
       // Update log
@@ -251,26 +193,26 @@ export default class Encounters extends AbstractModule {
     * show opponent name in menu
     */
    getMenuClosed(){
-      const opponent = this.getOpponent();
+      const opponent = this.player.getOpponent();
       const out = [];
 
       opponent ? out.push(
          {
             title: `Attack ${ opponent.getName() }`,
-            action: ()=>this.attack()
+            action: ()=> this.attack()
          },
          {
             title: `Encounters…`,
-            action: ()=>this.open()
+            action: ()=> this.open()
          }
       ) : out.push(
          {
             title: `Start encounter`,
-            action: ()=>this.start()
+            action: ()=> this.start()
          },
          {
             title: `Encounters…`,
-            action: ()=>this.open()
+            action: ()=> this.open()
          }
       );
 
@@ -283,7 +225,7 @@ export default class Encounters extends AbstractModule {
    getMenuOpen(){
 
       const canUseLuck = this.player.getAttr( 'luck' ) > 0;
-      const opponent = this.getOpponent();
+      const opponent = this.player.getOpponent();
       const opts = [ ...super.getMenuOpen() ];
 
       // Menu differs depending on whether an
@@ -315,8 +257,12 @@ export default class Encounters extends AbstractModule {
             {
                title: `Attack ${ opponent.getName() }`,
                action: ()=> this.attack()
+            },
+            {
+               title: `Add opponent`,
+               action: ()=> this.player.addOpponent()
             }
-         )
+         );
 
          if( this.useLuckConfig && canUseLuck ){
             opts.push(
