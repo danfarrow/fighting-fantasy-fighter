@@ -1,20 +1,26 @@
 "use strict";
 
-import AbstractModule from "./AbstractModule.mjs";
-import Game from "./Game.mjs";
+import AbstractModule from './AbstractModule.mjs';
+import Game from './Game.mjs';
 
 /**
  * Character class
  */
 export default class Character extends AbstractModule {
+
    constructor( game, name, skill, stamina ){
+
       super( game );
 
-      this.state.attributes = {
-         name: name || this.prompt( 'Opponent name' ),
-         skill: skill || this.numberPrompt( 'Opponent skill' ),
-         stamina: stamina || this.numberPrompt( 'Opponent stamina' )
-      };
+      this.state.attributes = {};
+      this.state.initialValue = {};
+
+      this.setAttr( 'name', name || this.prompt( 'Opponent name' ));
+      this.setAttr( 'skill', skill || this.numberPrompt( 'Opponent skill' ));
+      this.setAttr( 'stamina', stamina || this.numberPrompt( 'Opponent stamina' ));
+
+      // Character info always displays
+      this.alwaysVisible = true;
 
       // Store initial values of skill, stamina
       this.state.initialValues = {
@@ -27,6 +33,8 @@ export default class Character extends AbstractModule {
 
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.opponentFormat;
+      this.headerFormat = Game.opponentHeaderFormat;
+
    }
 
    /**
@@ -38,11 +46,10 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Is this character alive?
+    * Is this character alive or dead?
     */
-   isAlive(){
-      return this.getAttr( 'stamina' ) > 0;
-   }
+   isAlive(){ return this.getAttr( 'stamina' ) > 0 }
+   isDead(){ return !this.isAlive() }
 
    /**
     * Return name struck out if dead
@@ -60,6 +67,8 @@ export default class Character extends AbstractModule {
     *
     * string attr Name of attribute
     * int/string value Type-checked value
+    *
+    * @todo Accept relative amounts i.e. `+1`, `-1`
     */
    setAttr( attr, value ){
       if( '' === value ) return `Cancelled`;
@@ -83,7 +92,7 @@ export default class Character extends AbstractModule {
    getAttrPrompt(attr){
       const caption = `Set ${ this.getAttrCaption( attr ) }`;
 
-      return "name" === attr ?
+      return 'name' === attr ?
          this.prompt( caption )
          : this.numberPrompt( caption );
    }
@@ -102,6 +111,14 @@ export default class Character extends AbstractModule {
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       return `${ attrName } ${ Game.lowKeyFormat( `[${ attrValue }]` )}`;
    }
+
+   /**
+    * Title to be displayed in menu for this module
+    */
+   getMenuTitle(){
+      return this.getAttr( 'name' );
+   }
+
 
    /**
     * Populate menu in open state
@@ -134,14 +151,18 @@ export default class Character extends AbstractModule {
       const stamInit = this.state.initialValues.stamina;
       const stamLost = Math.max( stamInit - stamina, 0 );
 
-      const staminaString = this.format( "♥ ".repeat( stamina ))
-         + "♡ ".repeat( stamLost );
+      const staminaString =
+         this.format( '♥ '.repeat( stamina )) +
+         '♡ '.repeat( stamLost ) +
+         Game.lowKeyFormat( `[${ stamina }]` );
 
-      const skillString = this.format( "⚔ ".repeat( skill ));
+      const skillString =
+         this.format( '⚔ '.repeat( skill )) +
+         Game.lowKeyFormat( `[${ skill }]` );
 
-      const out = [ `[[${ this.getName() }]]${ skillString }` ];
+      const out = [ this.headerFormat( ` ${ this.getName() } ` ) ];
+      out.push( skillString );
       out.push( staminaString );
-
 
       // Add any extra status messages & clear status
       out.push( ...this.status );
@@ -174,7 +195,7 @@ export default class Character extends AbstractModule {
     */
    rollDice(){
       const dice = [ this.game.dice.roll(1), this.game.dice.roll(1) ];
-      this.status.push( this.game.dice.getAscii( dice, this.format ));
+//      this.status.push( this.game.dice.getAscii( dice, this.format ));
       return dice.reduce(( t, n ) => t + n );
    }
 
@@ -186,25 +207,41 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Take damage or heal (negative damage)
+    * Take damage: reduce stamina
     */
    damage( amt ){
 
-      this.setAttr(
-         'stamina',
-         this.getAttr( 'stamina' ) - amt
-      );
+      this.setAttr( 'stamina', this.getAttr( 'stamina' ) - amt );
 
       if( this.isAlive() ){
-         const caption = amt > 0 ?
-            ` was wounded [${ amt }]`
-            : ` was healed [${ Math.abs( amt ) }]`;
+         const n = this.getAttr( 'name');
+         this.setAttr( 'name', `*${ n }*` );
+         this.postRenderQueue.push( ()=> this.setAttr( 'name', n ) );
 
-         return `${ this.getName() }${ caption }!`;
+         // Add post-render functions to revert to original formats
+         const origFormat = this.format;
+         const origHeaderFormat = this.headerFormat;
+         this.postRenderQueue.push( ()=> this.format = origFormat )
+         this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat )
+
+         // Change output format to show damage
+         this.format = Game.characterDamageFormat
+         this.headerFormat = Game.characterDamageHeaderFormat;
+
+         return `${ n } was wounded [${ amt }]!`;
       }
 
       // Character is dead
+      // @todo Better way to check for death
       return `${ this.getName() } is dead!`
+   }
+
+   /**
+    * Heal: increase stamina
+    */
+   heal( amt ){
+      this.setAttr( 'stamina', this.getAttr( 'stamina' ) + amt );
+      return `${ this.getName() } was healed [${ amt }]!`;
    }
 
    /**

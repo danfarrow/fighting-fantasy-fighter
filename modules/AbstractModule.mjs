@@ -11,8 +11,9 @@ export default class AbstractModule {
 
    static currentlyOpen = null;
 
-   constructor(game){
+   constructor( game ){
       this.moduleName = this.constructor.name;
+
       this.game = game;
       this.indent = game.indent
 
@@ -28,6 +29,9 @@ export default class AbstractModule {
 
       // Status is used as the default render
       this.status = '';
+
+      // Array of functions to call after render
+      this.postRenderQueue = [];
    }
 
    /**
@@ -54,7 +58,7 @@ export default class AbstractModule {
       const input = this.prompt( `${msg}` );
 
       // Empty input cancels
-      if( "" === input ) return;
+      if( '' === input ) return;
 
       const number = parseInt( input );
       return isNaN( number ) ? this.numberPrompt() : number;
@@ -68,7 +72,7 @@ export default class AbstractModule {
       AbstractModule.currentlyOpen = this;
 
       this.visible = true;
-      return `${this.moduleName} menu opened`;
+      return `${ this.getMenuTitle() } menu opened`;
    }
 
    /**
@@ -77,8 +81,8 @@ export default class AbstractModule {
    close(){
       AbstractModule.currentlyOpen = null;
 
-      if( !this.alwaysVisible) this.visible = false;
-      return `${this.moduleName} menu closed`;
+      if( !this.alwaysVisible ) this.visible = false;
+      return `${ this.getMenuTitle() } menu closed`;
    }
 
    /**
@@ -115,9 +119,27 @@ export default class AbstractModule {
     * Return string to display in view
     */
    render(){
+      let output;
+
       if( this.visible || this.alwaysVisible ){
-         return this.getRender();
+         output = this.getRender();
       }
+
+      // Execute post-render queue
+      for( const f of this.postRenderQueue ){
+         f();
+      }
+
+      this.postRenderQueue = [];
+
+      return output;
+   }
+
+   /**
+    * Title to be displayed in menu for this module
+    */
+   getMenuTitle(){
+      return this.moduleName;
    }
 
    /**
@@ -136,7 +158,7 @@ export default class AbstractModule {
 
       return [
          {
-            title: `${this.moduleName}${ itemCount }…`,
+            title: `${ this.getMenuTitle() }${ itemCount }…`,
             action: ()=>this.open()
          }
       ]
@@ -150,7 +172,7 @@ export default class AbstractModule {
    getMenuOpen(){
       return [
          {
-            title: `${ Game.highKeyFormat( this.moduleName ) } ${ Game.menuIndexFormat( `×` ) }`,
+            title: `${ Game.highKeyFormat( this.getMenuTitle() ) } ${ Game.menuIndexFormat( `×` ) }`,
             action: ()=>this.close()
          }
       ]

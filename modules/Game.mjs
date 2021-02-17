@@ -23,8 +23,12 @@ export default class Game {
    static lowKeyFormat = clc.xterm(243).italic;// Light grey
    static highKeyFormat = clc.xterm(190);// Lime green
    static statusFormat = clc.xterm(190).italic;// Lime green
-   static opponentFormat = clc.xterm(190);// Lime green
    static playerFormat = clc.xterm(198);// Pinky red
+   static playerHeaderFormat = clc.xterm(0).bgXterm(198);
+   static opponentFormat = clc.xterm(190);// Lime green
+   static opponentHeaderFormat = clc.xterm(0).bgXterm(190);
+   static characterDamageFormat = clc.xterm(9);// Red fg
+   static characterDamageHeaderFormat = clc.xterm(0).bgXterm(9);// Red bg
    static promptFormat = clc.xterm(45).bold;// Vivid blue
    static menuIndexFormat = clc.xterm(45);// Vivid blue
 
@@ -185,7 +189,7 @@ export default class Game {
    fancyHeaders( str ){
       return str.replace(
          /\[\[(.*)\]\]/g,
-         (match, p1) => Game.moduleTitleFormat( ` ${ p1 } ` ) + `\n`
+         (match, p1) => Game.moduleTitleFormat( ` ${ p1 } ` )
       );
    }
 

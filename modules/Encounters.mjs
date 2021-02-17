@@ -43,8 +43,6 @@ export default class Encounters extends AbstractModule {
 
    /**
     * Fight round
-    *
-    * @todo Still quite monolithic
     */
    attack(){
       // Increment roundCount in log
@@ -59,8 +57,6 @@ export default class Encounters extends AbstractModule {
       // @todo Check for instant death
 
       // Get attack strengths
-      // @todo Move this into player object
-      //     so player can check for instant death
       const playerAS = player.getAttackStrength( player.rollDice() );
       const opponentAS = opponent.getAttackStrength( opponent.rollDice() );
 
@@ -81,7 +77,7 @@ export default class Encounters extends AbstractModule {
          // Set 'use luck' functions
          this.useLuckConfig = {
             title: 'Use luck to reduce injury',
-            lucky: ()=> player.damage( -1 ),
+            lucky: ()=> player.heal( 1 ),
             unlucky: ()=> player.damage( 1 )
          };
 
@@ -100,7 +96,7 @@ export default class Encounters extends AbstractModule {
          this.useLuckConfig = {
             title: "Use luck to increase damage",
             lucky: ()=> opponent.damage( 2 ),
-            unlucky: ()=> opponent.damage( -1 )
+            unlucky: ()=> opponent.heal( 1 )
          };
 
          // Opponent died
@@ -130,7 +126,7 @@ export default class Encounters extends AbstractModule {
       this.useLuckConfig = null;
 
       // Get boolean luck test result
-      const lucky = this.player.testLuck(true);
+      const lucky = this.player.testLuck( true );
       const ascii = this.player.getLuckAscii( lucky );
 
       if( lucky ) {
@@ -144,9 +140,18 @@ export default class Encounters extends AbstractModule {
    }
 
    /**
+    * Return attack strength (2 dice + skill)
+    * @todo Check for double / instant death
+    */
+   getAttackStrength( diceRoll ){
+      return diceRoll + this.getAttr( 'skill' );
+   }
+
+   /**
     * Finish the current encounter & close menu
     */
    end( victor, loser ){
+
       const r = this.state.log.roundCount;
       const opponent = this.player.getOpponent();
       let msg;
@@ -281,9 +286,9 @@ export default class Encounters extends AbstractModule {
          );
 
          // Add opponent character menu
-         const oppMenu = opponent.getMenuOpen();
-         oppMenu.shift();// HACK Remove opponent's [close menu]
-         opts.push(...oppMenu);
+         // const oppMenu = opponent.getMenuOpen();
+         // oppMenu.shift();// HACK Remove opponent's [close menu]
+         // opts.push(...oppMenu);
 
       }
 

@@ -23,9 +23,6 @@ export default class Player extends Character {
 
       super( game, 'Anonymous Player', skill, stamina );
 
-      // Player info always displays
-      this.alwaysVisible = true;
-
       // Add extra player attributes
       const a = this.state.attributes = {
          ...this.state.attributes,
@@ -33,11 +30,15 @@ export default class Player extends Character {
          gold: gold
       }
 
+//      this.setAttr( 'luck', luck );
+//      this.setAttr( 'gold', gold );
+
       // Add initial value for luck
       this.state.initialValues.luck = luck;
 
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.playerFormat;
+      this.headerFormat = Game.playerHeaderFormat;
    }
 
    /**
@@ -48,6 +49,11 @@ export default class Player extends Character {
       const opponent = new Character( this.game );
 
       this.opponent = opponent;
+
+      // Push character as second module, after player
+      this.game.modules.shift();
+      this.game.modules.unshift( opponent );
+      this.game.modules.unshift( this );
 
       // Store reference to opponent state in local state
       this.state.opponentState = this.opponent.state;
@@ -85,7 +91,11 @@ export default class Player extends Character {
          this.state.opponentState.attributes.skill,
          this.state.opponentState.attributes.stamina
       );
-      // opponent.state = {...this.state.opponentState };
+
+      // Push character as second module, after player
+      this.game.modules.shift();
+      this.game.modules.unshift( opponent );
+      this.game.modules.unshift( this );
 
       // Now overwrite local state with opponent's state obj
       this.state.opponentState = {...opponent.state};
@@ -102,7 +112,8 @@ export default class Player extends Character {
       // Check for attribute in state, whilst respecting zero values
       if( !Object.keys(this.state.attributes).includes( attr ) ) return;
 
-      if( !this.state.initialValues[attr] ){
+      // `!this.state.initialValues` little bugfix :(
+      if( !this.state.initialValues || !this.state.initialValues[attr] ){
          return super.getAttrCaption( attr, capitalise );
       }
 
@@ -161,22 +172,20 @@ export default class Player extends Character {
       return this.getMenu( super.getMenuOpen() );
    }
 
-   getMenuClosed(){
-      return this.getMenu( super.getMenuClosed() );
-   }
+   /**
+    * Add player specific items to menu
+    */
+   getMenu(){
 
-   getMenu( menu ){
-
-      const stamina = this.getAttr( 'stamina' );
-
-      menu.push(
-         {
-            title: `Roll dice`,
-            action: ()=> `You rolled ${ this.rollDice() }`
-         }
-      );
+      const menu = super.getMenuOpen();
+      //    {
+      //       title: `Roll dice`,
+      //       action: ()=> `You rolled ${ this.rollDice() }`
+      //    }
+      // ];
 
       if( this.getAttr('luck') > 0 ){
+
          const luck = this.getAttr('luck');
          const luckCount = Game.lowKeyFormat( `[${ luck }]` );
 
@@ -189,18 +198,5 @@ export default class Player extends Character {
       };
 
       return menu;
-   }
-
-   /**
-    * Display opponent stats if applicable
-    */
-   getRender(){
-      const opponent = this.getOpponent();
-      if( !opponent ) return super.getRender();
-
-      // Clear dead opponent
-      if( !opponent.isAlive() ) delete this.opponent;
-
-      return `${ super.getRender() }\n\n${ opponent.getRender() }`;
    }
 }
