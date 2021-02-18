@@ -59,10 +59,24 @@ export default class Game {
       this.snapshots.import( 'autosave' );
 
       // Greet player
-      this.status = `Welcome ${this.player.getName()}!`;
+      this.status = `Welcome ${ this.player.getName() }!`;
 
       //Start input loop
       this.start();
+   }
+
+   /**
+    * Remove a specific module - used when opponent dies
+    */
+   removeModule( module ){
+      const arr = this.modules;
+      const index = arr.indexOf( module );
+
+      if( !index ) return;
+
+      this.modules =
+         arr.slice( 0, index )
+         .concat( arr.slice( index + 1 ));
    }
 
    /**
@@ -79,13 +93,13 @@ export default class Game {
     * Combine menu arrays from each module
     */
    getMenuConfig(){
-      let menuConfig = [];
+      let menu = [];
 
-      for( let module of this.modules ){
-         menuConfig = [...menuConfig, ...module.menu()];
+      for( const module of this.modules ){
+         menu = [ ...menu, ...module.menu() ];
       }
 
-      return menuConfig;
+      return menu;
    }
 
    /**
@@ -109,7 +123,7 @@ export default class Game {
     */
    render(){
       // Clear screen
-      process.stdout.write(clc.reset);
+      // process.stdout.write(clc.reset);
 
       // Render output with spacing & indentation
       this._();
@@ -120,6 +134,7 @@ export default class Game {
       this._();
       this._( Game.statusFormat(`${ this.status }`) );
       this._();
+
    }
 
    /**

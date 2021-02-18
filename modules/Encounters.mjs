@@ -12,7 +12,6 @@ export default class Encounters extends AbstractModule {
       super( game );
       this.dice = game.dice;
       this.player = game.player;
-      this.opponent;
       this.useLuckConfig;
       this.state.history = [];
       this.alwaysVisible = true;
@@ -172,7 +171,6 @@ export default class Encounters extends AbstractModule {
 
       // Reset all state except history
       this.state = { history: this.state.history }
-      delete this.opponent;
 
       this.close();
       return msg;
@@ -198,19 +196,19 @@ export default class Encounters extends AbstractModule {
     * show opponent name in menu
     */
    getMenuClosed(){
-      const opponent = this.player.getOpponent();
-      const out = [];
+      const opponentName = this.player.getOpponentName();
+      const menu = [];
 
-      opponent ? out.push(
+      opponentName ? menu.push(
          {
-            title: `Attack ${ opponent.getName() }`,
+            title: `Attack ${ opponentName }`,
             action: ()=> this.attack()
          },
          {
             title: `Encounters…`,
             action: ()=> this.open()
          }
-      ) : out.push(
+      ) : menu.push(
          {
             title: `Start encounter`,
             action: ()=> this.start()
@@ -221,7 +219,7 @@ export default class Encounters extends AbstractModule {
          }
       );
 
-      return out;
+      return menu;
    }
 
    /**
@@ -230,13 +228,14 @@ export default class Encounters extends AbstractModule {
    getMenuOpen(){
 
       const canUseLuck = this.player.getAttr( 'luck' ) > 0;
-      const opponent = this.player.getOpponent();
-      const opts = [ ...super.getMenuOpen() ];
+      const opponentName = this.player.getOpponentName();
+      const menu = [ ...super.getMenuOpen() ];
+
 
       // Menu differs depending on whether an
       // encounter is in progress
-      if( !opponent ){
-         opts.push(
+      if( !opponentName ){
+         menu.push(
             {
                title: `Start encounter`,
                action: ()=>this.start()
@@ -246,7 +245,7 @@ export default class Encounters extends AbstractModule {
          // If there is an encounter history
          // add `Encounter history` menu item
          if( this.state.history.length ){
-            opts.push(
+            menu.push(
                {
                   title: `Encounter history`,
                   action: ()=> this.history()
@@ -258,9 +257,9 @@ export default class Encounters extends AbstractModule {
          // An encounter is in progress - add `Attack...`,
          // `Use luck` (if available), `End encounter`
          // & opponent attribute menu items
-         opts.push(
+         menu.push(
             {
-               title: `Attack ${ opponent.getName() }`,
+               title: `Attack ${ opponentName }`,
                action: ()=> this.attack()
             },
             {
@@ -270,7 +269,7 @@ export default class Encounters extends AbstractModule {
          );
 
          if( this.useLuckConfig && canUseLuck ){
-            opts.push(
+            menu.push(
                {
                   title: this.useLuckConfig.title,
                   action: ()=> this.useLuck()
@@ -278,20 +277,15 @@ export default class Encounters extends AbstractModule {
             )
          }
 
-         opts.push(
+         menu.push(
             {
                title: `Escape encounter`,
                action: ()=>this.end()
             }
          );
 
-         // Add opponent character menu
-         // const oppMenu = opponent.getMenuOpen();
-         // oppMenu.shift();// HACK Remove opponent's [close menu]
-         // opts.push(...oppMenu);
-
       }
 
-      return opts;
+      return menu;
    }
 }

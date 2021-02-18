@@ -13,7 +13,7 @@ export default class Character extends AbstractModule {
       super( game );
 
       this.state.attributes = {};
-      this.state.initialValue = {};
+      // this.state.initialValue = {};
 
       this.setAttr( 'name', name || this.prompt( 'Opponent name' ));
       this.setAttr( 'skill', skill || this.numberPrompt( 'Opponent skill' ));
@@ -213,27 +213,30 @@ export default class Character extends AbstractModule {
 
       this.setAttr( 'stamina', this.getAttr( 'stamina' ) - amt );
 
+      // Change output format to show damage
+      const origFormat = this.format;
+      const origHeaderFormat = this.headerFormat;
+      this.format = Game.characterDamageFormat
+      this.headerFormat = Game.characterDamageHeaderFormat;
+
+      const n = this.getAttr( 'name');
+
       if( this.isAlive() ){
-         const n = this.getAttr( 'name');
-         this.setAttr( 'name', `*${ n }*` );
-         this.postRenderQueue.push( ()=> this.setAttr( 'name', n ) );
 
          // Add post-render functions to revert to original formats
-         const origFormat = this.format;
-         const origHeaderFormat = this.headerFormat;
-         this.postRenderQueue.push( ()=> this.format = origFormat )
-         this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat )
-
-         // Change output format to show damage
-         this.format = Game.characterDamageFormat
-         this.headerFormat = Game.characterDamageHeaderFormat;
+         this.postRenderQueue.push( ()=> this.format = origFormat );
+         this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat );
 
          return `${ n } was wounded [${ amt }]!`;
       }
 
       // Character is dead
-      // @todo Better way to check for death
-      return `${ this.getName() } is dead!`
+      // @todo Better way to check for death?
+
+      // Add post-render function to remove this module
+      this.postRenderQueue.push( ()=> this.game.removeModule( this ));
+
+      return `${ n } is dead!`
    }
 
    /**

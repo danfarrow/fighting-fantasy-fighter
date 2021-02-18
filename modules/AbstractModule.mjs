@@ -68,10 +68,16 @@ export default class AbstractModule {
     * Set this module to `open`
     */
    open(){
-      if( AbstractModule.currentlyOpen ) AbstractModule.currentlyOpen.close();
+
+      // Close currently open module
+      if( AbstractModule.currentlyOpen ){
+         AbstractModule.currentlyOpen.close();
+      }
+
       AbstractModule.currentlyOpen = this;
 
       this.visible = true;
+
       return `${ this.getMenuTitle() } menu opened`;
    }
 
@@ -82,6 +88,7 @@ export default class AbstractModule {
       AbstractModule.currentlyOpen = null;
 
       if( !this.alwaysVisible ) this.visible = false;
+
       return `${ this.getMenuTitle() } menu closed`;
    }
 
@@ -98,16 +105,19 @@ export default class AbstractModule {
    menu(){
       if( this.isOpen() ){
 
-         const menuConfig = this.getMenuOpen();
+         const menu = this.getMenuOpen();
 
          // Prepend indent to each config item
-         for(let i = 1; i < menuConfig.length; i++){
+         for( let i = 1; i < menu.length; i++ ){
+
             const s = Game.highKeyFormat(
-               i < menuConfig.length -1 ? `├─ ` : `└─ `
+               i < menu.length -1 ? `├─ ` : `└─ `
             );
-            menuConfig[i].title = `${s}${menuConfig[i].title}`;
+
+            menu[i].title = `${ s }${ menu[i].title }`;
          }
-         return menuConfig;
+
+         return menu;
       }
 
       if( AbstractModule.currentlyOpen ) return [];
@@ -125,7 +135,9 @@ export default class AbstractModule {
          output = this.getRender();
       }
 
-      // Execute post-render queue
+      // Execute post-render queue, an array of functions
+      // used to clean up changes that only persist for
+      // one render
       for( const f of this.postRenderQueue ){
          f();
       }
@@ -152,6 +164,7 @@ export default class AbstractModule {
       // For subclasses that have an array of items
       // i.e. Inventory, Snapshots, Notes
       const a = this.state.a;
+
       const itemCount = a && a.length ?
          Game.lowKeyFormat(` [${ a.length }]`)
          : '';
@@ -159,7 +172,7 @@ export default class AbstractModule {
       return [
          {
             title: `${ this.getMenuTitle() }${ itemCount }…`,
-            action: ()=>this.open()
+            action: ()=> this.open()
          }
       ]
    }

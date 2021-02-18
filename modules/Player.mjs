@@ -50,10 +50,10 @@ export default class Player extends Character {
 
       this.opponent = opponent;
 
-      // Push character as second module, after player
-      this.game.modules.shift();
+      // Push character module as module #2, after player
+      const player = this.game.modules.shift();
       this.game.modules.unshift( opponent );
-      this.game.modules.unshift( this );
+      this.game.modules.unshift( player );
 
       // Store reference to opponent state in local state
       this.state.opponentState = this.opponent.state;
@@ -65,6 +65,7 @@ export default class Player extends Character {
     * Return opponent or instantiate from this.state
     */
    getOpponent(){
+
       if( !this.opponent ){
 
          // Attempt to restore from stored state
@@ -78,12 +79,26 @@ export default class Player extends Character {
    }
 
    /**
+    * Return name if player has opponent
+    * or if opponent exists in state after
+    * snapshot restore
+    */
+   getOpponentName(){
+      if( this.opponent ){
+         return this.opponent.getName();
+      }
+
+      if( this.state.opponentState ){
+         return this.state.opponentState.attributes.name;
+      }
+   }
+
+   /**
     * Restore opponent from stored state
     */
    restoreOpponent(){
 
       if( !this.state.opponentState ) return;
-
       // Instantiate opponent with copy of stored state
       const opponent = new Character(
          this.game,
@@ -91,6 +106,7 @@ export default class Player extends Character {
          this.state.opponentState.attributes.skill,
          this.state.opponentState.attributes.stamina
       );
+
 
       // Push character as second module, after player
       this.game.modules.shift();
