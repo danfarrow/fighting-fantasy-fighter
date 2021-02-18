@@ -35,7 +35,7 @@ export default class Game {
    constructor(){
 
       // Output indentation
-      this.indent = `    `;
+      this.indent = ` `.repeat( 4 );
 
       // Instantiate modules
       this.menu = new Menu( this );
