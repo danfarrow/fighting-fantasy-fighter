@@ -42,6 +42,15 @@ export default class Player extends Character {
    }
 
    /**
+    * Fix opponent getting initialised
+    * during menu render, when Encounters
+    * calls `player.getOpponent()`
+    */
+   postRestore(){
+      this.getOpponent();
+   }
+
+   /**
     * Add opponent
     */
    addOpponent(){
@@ -62,6 +71,14 @@ export default class Player extends Character {
    }
 
    /**
+    * Remove opponent
+    */
+   onEncounterEnd( opponent ){
+      this.opponent = null;
+      this.state.opponentState = null;
+   }
+
+   /**
     * Return opponent or instantiate from this.state
     */
    getOpponent(){
@@ -79,26 +96,12 @@ export default class Player extends Character {
    }
 
    /**
-    * Return name if player has opponent
-    * or if opponent exists in state after
-    * snapshot restore
-    */
-   getOpponentName(){
-      if( this.opponent ){
-         return this.opponent.getName();
-      }
-
-      if( this.state.opponentState ){
-         return this.state.opponentState.attributes.name;
-      }
-   }
-
-   /**
     * Restore opponent from stored state
     */
    restoreOpponent(){
 
       if( !this.state.opponentState ) return;
+
       // Instantiate opponent with copy of stored state
       const opponent = new Character(
          this.game,

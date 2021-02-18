@@ -66,7 +66,12 @@ export default class Dice extends AbstractModule {
    }
 
    // Dice are not on the menu
-   getMenuClosed(){ return [] }
+   getMenuClosed(){ return [
+      {
+         title: 'Roll dice',
+         action: ()=> this.roll(2)
+      }
+   ] }
 
    /**
     * Roll n dice

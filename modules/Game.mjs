@@ -49,10 +49,10 @@ export default class Game {
       this.modules = [
          this.player,
          this.encounters,
-         this.dice,
          this.inventory,
          this.notes,
          this.snapshots,
+         this.dice,
       ];
 
       // Try to load autosave
@@ -123,7 +123,7 @@ export default class Game {
     */
    render(){
       // Clear screen
-      // process.stdout.write(clc.reset);
+      process.stdout.write(clc.reset);
 
       // Render output with spacing & indentation
       this._();

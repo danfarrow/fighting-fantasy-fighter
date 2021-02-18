@@ -17,6 +17,10 @@ export default class Encounters extends AbstractModule {
       this.alwaysVisible = true;
    }
 
+   getMenuTitle(){
+      return 'Encounter';
+   }
+
    /**
     * Begin a new encounter
     */
@@ -81,8 +85,8 @@ export default class Encounters extends AbstractModule {
          };
 
          // Player died
-         if( !player.isAlive() ){
-            return this.end( opponent, player );
+         if( player.isDead() ){
+            return this.lose( opponent );
          }
 
       } else if( playerAS > opponentAS ){
@@ -99,8 +103,8 @@ export default class Encounters extends AbstractModule {
          };
 
          // Opponent died
-         if( !opponent.isAlive() ) {
-            return this.end( player, opponent );
+         if( opponent.isDead() ) {
+            return this.win( opponent );
          }
 
       } else {
@@ -147,34 +151,54 @@ export default class Encounters extends AbstractModule {
    }
 
    /**
-    * Finish the current encounter & close menu
+    * Player escaped the encounter
     */
-   end( victor, loser ){
+   escape( opponent ){
+      const outcome = `Escaped from ${ opponent.getName() }`
+      return this.end( opponent, outcome );
+   }
 
+   /**
+    * Player won the encounter
+    */
+   win( opponent ){
       const r = this.state.log.roundCount;
-      const opponent = this.player.getOpponent();
-      let msg;
+      const outcome =
+         `${ opponent.getName() } killed in ` +
+         `${ r } round${ r > 1 ? 's' : '' }`;
+
+      return this.end( opponent, outcome );
+   }
+
+   /**
+    * Player lost the encounter
+    */
+   lose( opponent ){
+      const r = this.state.log.roundCount;
+      const outcome =
+         `${ this.player.getName() } killed in ` +
+         `${ r } round${ r > 1 ? 's' : '' }`;
+
+      return this.end( opponent, outcome );
+   }
+
+   /**
+    * End the current encounter, close menu, clean up
+    */
+   end( opponent, outcome ){
+
+      this.player.onEncounterEnd( opponent );
 
       // Update log
-      if( victor ){
-         msg = `${ loser.getName() } killed in `
-            + `${ r } round${r > 1 ? 's' : ''}`;
-      } else {
-         msg = `Encounter with `
-            + opponent.getName()
-            + ` ended` ;
-      }
-
-      // Save log
-      this.state.log.outcome = msg;
+      this.state.log.outcome = outcome;
       this.state.history.push( this.state.log );
 
       // Reset all state except history
       this.state = { history: this.state.history }
 
       this.close();
-      return msg;
 
+      return outcome;
    }
 
    /**
@@ -195,32 +219,32 @@ export default class Encounters extends AbstractModule {
     * If an encounter is in progress
     * show opponent name in menu
     */
-   getMenuClosed(){
-      const opponentName = this.player.getOpponentName();
-      const menu = [];
+   // getMenuClosed(){
+   //    const opponent = this.player.getOpponent();
+   //    const menu = [];
 
-      opponentName ? menu.push(
-         {
-            title: `Attack ${ opponentName }`,
-            action: ()=> this.attack()
-         },
-         {
-            title: `Encounters…`,
-            action: ()=> this.open()
-         }
-      ) : menu.push(
-         {
-            title: `Start encounter`,
-            action: ()=> this.start()
-         },
-         {
-            title: `Encounters…`,
-            action: ()=> this.open()
-         }
-      );
+   //    opponent && opponent.isAlive() ? menu.push(
+   //       {
+   //          title: `Attack ${ opponent.getName() }`,
+   //          action: ()=> this.attack()
+   //       },
+   //       {
+   //          title: `Encounters…`,
+   //          action: ()=> this.open()
+   //       }
+   //    ) : menu.push(
+   //       {
+   //          title: `Start encounter`,
+   //          action: ()=> this.start()
+   //       },
+   //       {
+   //          title: `Encounters…`,
+   //          action: ()=> this.open()
+   //       }
+   //    );
 
-      return menu;
-   }
+   //    return menu;
+   // }
 
    /**
     * Get menu config when module menu is open
@@ -228,13 +252,13 @@ export default class Encounters extends AbstractModule {
    getMenuOpen(){
 
       const canUseLuck = this.player.getAttr( 'luck' ) > 0;
-      const opponentName = this.player.getOpponentName();
+      const opponent = this.player.getOpponent();
       const menu = [ ...super.getMenuOpen() ];
 
 
       // Menu differs depending on whether an
       // encounter is in progress
-      if( !opponentName ){
+      if( !opponent || opponent.isDead() ){
          menu.push(
             {
                title: `Start encounter`,
@@ -259,7 +283,7 @@ export default class Encounters extends AbstractModule {
          // & opponent attribute menu items
          menu.push(
             {
-               title: `Attack ${ opponentName }`,
+               title: `Attack ${ opponent.getName() }`,
                action: ()=> this.attack()
             },
             {
@@ -280,7 +304,7 @@ export default class Encounters extends AbstractModule {
          menu.push(
             {
                title: `Escape encounter`,
-               action: ()=>this.end()
+               action: ()=>this.escape( opponent )
             }
          );
 

@@ -137,6 +137,11 @@ export default class Snapshots extends AbstractModule {
          count++;
       }
 
+      // Call `postRestore` hook on all modules
+      for( const module of this.game.modules ){
+         module.postRestore();
+      }
+
       if( count ){
          return `Section ${ section } snapshot restored`;
       }

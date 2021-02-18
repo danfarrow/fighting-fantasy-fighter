@@ -16,8 +16,8 @@ export default class Character extends AbstractModule {
       // this.state.initialValue = {};
 
       this.setAttr( 'name', name || this.prompt( 'Opponent name' ));
-      this.setAttr( 'skill', skill || this.numberPrompt( 'Opponent skill' ));
-      this.setAttr( 'stamina', stamina || this.numberPrompt( 'Opponent stamina' ));
+      this.setAttr( 'skill', skill !== undefined ? skill : this.numberPrompt( 'Opponent skill' ));
+      this.setAttr( 'stamina', stamina !== undefined ? stamina : this.numberPrompt( 'Opponent stamina' ));
 
       // Character info always displays
       this.alwaysVisible = true;

@@ -148,6 +148,13 @@ export default class AbstractModule {
    }
 
    /**
+    * Event hook to be overwritten by child classes
+    */
+   postRestore(){
+
+   }
+
+   /**
     * Title to be displayed in menu for this module
     */
    getMenuTitle(){
