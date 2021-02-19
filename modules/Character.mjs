@@ -208,10 +208,18 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Return attack strength (2 dice + skill)
+    * Return attack strength total (2 dice + skill),
+    * isDouble & status update
     */
-   getAttackStrength( diceRoll ){
-      return diceRoll + this.getAttr( 'skill' );
+   getAttackStrength( ){
+      const { total, isDouble, rolls } = this.rollDice();
+      const skill = this.getAttr( 'skill' );
+      const name = this.getAttr( 'name' );
+
+      // Compose attack status line
+      const attackStrength = total + skill;
+      const status = `${ name }: ${ attackStrength } [ Sk: ${ skill } + ${ rolls[0] } + ${ rolls[1] } ]`;
+      return { total: attackStrength, isDouble, status };
    }
 
    /**
