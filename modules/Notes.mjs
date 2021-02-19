@@ -21,14 +21,14 @@ export default class Notes extends Inventory {
             action: ()=>this.close()
          },
          {
-            title: "Add",
+            title: 'Add note',
             action: ()=>this.add()
          }
       ];
 
       if( this.state.a.length ){
          opts.push({
-            title: "Remove",
+            title: 'Remove note',
             action: ()=>this.remove()
          });
       }

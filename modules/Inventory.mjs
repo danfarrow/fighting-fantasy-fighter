@@ -8,7 +8,6 @@ import AbstractModule from './AbstractModule.mjs';
 export default class Inventory extends AbstractModule {
    constructor( game ){
       super( game );
-      this.alwaysVisible = true;
       this.state.a = [];
    }
 
@@ -71,10 +70,17 @@ export default class Inventory extends AbstractModule {
    }
 
    getMenuOpen(){
+
+      // If inventory is empty display
+      // a more verbose `Add item` message
+      const addItemCaption = this.state.a.length ?
+         'Add item' :
+         'Add inventory item';
+
       const opts = [
          ...super.getMenuOpen(),
          {
-            title: 'Add inventory item',
+            title: addItemCaption,
             action: ()=>this.add()
          }
       ];
@@ -82,7 +88,7 @@ export default class Inventory extends AbstractModule {
       if( this.state.a.length ){
          opts.push(
             {
-               title: 'Drop',
+               title: 'Drop item',
                action: ()=>this.remove()
             },
             {
