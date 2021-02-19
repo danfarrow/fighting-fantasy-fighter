@@ -75,7 +75,7 @@ export default class Encounters extends AbstractModule {
 
          // Player died
          if( player.isDead() ){
-            return this.lose( opponent );
+            return `${ output.join( `\n` ) }\n${ this.lose( opponent ) }`;
          }
 
       } else if( loser === opponent ){
@@ -90,7 +90,7 @@ export default class Encounters extends AbstractModule {
 
          // Opponent died
          if( opponent.isDead() ) {
-            return this.win( opponent );
+            return `${ output.join( `\n` ) }\n${ this.win( opponent ) }`;
          }
 
       } else {

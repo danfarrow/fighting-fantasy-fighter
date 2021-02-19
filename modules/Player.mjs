@@ -75,12 +75,12 @@ export default class Player extends Character {
     * Attack the supplied opponent
     */
    attack( opponent ){
+      // Instant Death rule: if player throws a double, opponent dies
+      const instantDeathRule = true;
 
       // Get attack strengths
       const { total: playerRoll, isDouble, rolls: playerRolls } = this.rollDice();
       const { total: opponentRoll, rolls: opponentRolls } = opponent.rollDice();
-
-      // @todo Check `isDouble` for instant Death
 
       const playerAttack = this.getAttackStrength( playerRoll );
       const opponentAttack = opponent.getAttackStrength( opponentRoll );
@@ -88,11 +88,22 @@ export default class Player extends Character {
       // Damage amount
       const damage = 2;
 
+      const output = [];
+
+      if( isDouble && instantDeathRule ){
+         output.push(
+            'INSTANT DEATH',
+            opponent.damage( opponent.getAttr( 'stamina' ))
+         );
+
+         return { output, loser: opponent }
+      }
+
       // Add attacks to output
-      const output = [
+      output.push(
          `${ this.getName() } attack: ${ playerAttack } [${ playerRolls.join(' ') }]`,
          `${ opponent.getName() } attack: ${ opponentAttack } [${ opponentRolls.join(' ') }]`
-      ];
+      );
 
       // Check for miss, or calculate loser
       let loser;
