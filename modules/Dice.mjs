@@ -10,6 +10,8 @@ export default class Dice extends AbstractModule {
    constructor( game ){
       super( game );
 
+      this.alwaysVisible = true;
+
       // Dice module not exported
       delete this.state;
 
@@ -59,7 +61,7 @@ export default class Dice extends AbstractModule {
    getMenuClosed(){ return [
       {
          title: 'Roll dice',
-         action: ()=> this.roll( 2 )
+         action: ()=> this.rollManual()
       }
    ] }
 
@@ -92,6 +94,21 @@ export default class Dice extends AbstractModule {
          isDouble,
          total
       };
+   }
+
+   rollManual(){
+      const { ascii, total, isDouble, rolls } = this.roll();
+
+      this.status = ascii;
+      this.postRenderQueue.push(
+         ()=> delete this.status
+      );
+
+      if( isDouble ){
+         return `You rolled double ${ rolls[0] }`;
+      }
+
+      return `You rolled ${ total } [ ${ rolls.join( ' + ' ) } ]`;
    }
 
    /**
