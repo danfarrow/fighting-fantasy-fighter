@@ -1,8 +1,6 @@
 "use strict";
 
 import AbstractModule from "./AbstractModule.mjs";
-import Character from "./Character.mjs";
-import Game from "./Game.mjs";
 
 /**
  * Encounter class
@@ -75,6 +73,8 @@ export default class Encounters extends AbstractModule {
 
          // Player died
          if( player.isDead() ){
+            // Remove `injured` message
+            output.pop();
             return `${ output.join( `\n` ) }\n${ this.lose( opponent ) }`;
          }
 
@@ -177,6 +177,7 @@ export default class Encounters extends AbstractModule {
    end( opponent, outcome ){
 
       this.player.onEncounterEnd( opponent );
+      opponent.onEncounterEnd();
 
       // Update log
       this.state.log.outcome = outcome;

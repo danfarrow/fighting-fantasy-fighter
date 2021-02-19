@@ -226,11 +226,14 @@ export default class Character extends AbstractModule {
       }
 
       // Character is dead
-      // @todo Better way to check for death?
-
-      // Add post-render function to remove this module
-      this.postRenderQueue.push( ()=> this.game.removeModule( this ));
       return `${ n } killed!`
+   }
+
+   /**
+    * Remove self from game modules
+    */
+   onEncounterEnd(){
+      this.postRenderQueue.push( ()=> this.game.removeModule( this ));
    }
 
    /**

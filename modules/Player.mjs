@@ -30,9 +30,6 @@ export default class Player extends Character {
          gold: gold
       }
 
-//      this.setAttr( 'luck', luck );
-//      this.setAttr( 'gold', gold );
-
       // Add initial value for luck
       this.state.initialValues.luck = luck;
 
