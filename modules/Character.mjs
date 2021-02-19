@@ -55,11 +55,7 @@ export default class Character extends AbstractModule {
     * Return name struck out if dead
     */
    getName(){
-      const name = this.getAttr( 'name' );
-
-      if( this.isAlive() ) return name;
-
-      return Game.strikeFormat( name );
+      return this.getAttr( 'name' );
    }
 
    /**
@@ -243,7 +239,7 @@ export default class Character extends AbstractModule {
          this.postRenderQueue.push( ()=> this.format = origFormat );
          this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat );
 
-         return `${ n } was wounded [${ amt }]!`;
+         return `${ n } wounded [${ amt }]!`;
       }
 
       // Character is dead
@@ -251,7 +247,7 @@ export default class Character extends AbstractModule {
 
       // Add post-render function to remove this module
       this.postRenderQueue.push( ()=> this.game.removeModule( this ));
-      return `${ n } is dead!`
+      return `${ n } killed!`
    }
 
    /**
@@ -259,7 +255,7 @@ export default class Character extends AbstractModule {
     */
    heal( amt ){
       this.setAttr( 'stamina', this.getAttr( 'stamina' ) + amt );
-      return `${ this.getName() } was healed [${ amt }]!`;
+      return `${ this.getName() } healed [${ amt }]!`;
    }
 
    /**
