@@ -221,7 +221,7 @@ export default class Player extends Character {
 
       } else {
 
-         const total = this.game.dice.rollQuiet();
+         const total = this.game.dice.rollQuiet( 2 );
          lucky = total <= this.state.attributes.luck;
          this.setAttr( 'luck', this.getAttr( 'luck' ) - 1 );
 
@@ -236,7 +236,7 @@ export default class Player extends Character {
     * Return ascii string of lucky / unlucky
     */
    getLuckAscii( lucky ){
-      const out = lucky ?
+      const arr = lucky ?
          [
             " _   _   _  ___ _  ____   __",
             "| | | | | |/ __| |/ /\\ \\ / /",
@@ -249,7 +249,10 @@ export default class Player extends Character {
             " \\___/|_|\\_|____\\___/ \\___|_|\\_\\  |_|  "
          ];
 
-      return `${out.join(`\n`)}`;
+      const txt = arr.join( `\n` );
+      return lucky ?
+         Game.playerFormat( txt ) :
+         Game.characterDamageFormat( txt );
    }
 
    getMenuOpen(){

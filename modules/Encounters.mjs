@@ -119,13 +119,12 @@ export default class Encounters extends AbstractModule {
 
       // Get boolean luck test result
       const lucky = this.player.testLuck( true );
-      const ascii = this.player.getLuckAscii( lucky );
       const output = [];
 
       if( lucky ) {
-         output.push( ascii, luckConfig.lucky() );
+         output.push( luckConfig.lucky() );
       } else {
-         output.push( ascii, luckConfig.unlucky() );
+         output.push( luckConfig.unlucky() );
       }
 
       // @todo Check for player / opponent death
