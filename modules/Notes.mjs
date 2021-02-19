@@ -1,38 +1,49 @@
 "use strict";
 
-import Inventory from "./Inventory.mjs";
-import Game from "./Game.mjs";
+import AbstractCollectionModule from './AbstractCollectionModule.mjs';
 
 /**
  * Notes manager
  */
-export default class Notes extends Inventory {
+export default class Notes extends AbstractCollectionModule {
    constructor( game ){
       super( game );
-   }
 
-   added( item ){ return `Note added` }
-   removed( item ){ return `Note removed` }
-
-   getMenuOpen(){
-      const opts = [
-         {
-            title: `${this.moduleName} ${ Game.menuIndexFormat(`×`) }`,
-            action: ()=>this.close()
-         },
-         {
-            title: 'Add note',
-            action: ()=>this.add()
-         }
-      ];
-
-      if( this.state.a.length ){
-         opts.push({
-            title: 'Remove note',
-            action: ()=>this.remove()
-         });
+      // Custom captions for notes
+      this.captions = {
+         ...this.captions,
+         addMenu: 'Add note',
+         addMenuVerbose: `Add note`,
+         removeMenu: 'Remove note',
+         removeAllMenu: 'Remove all notes',
+         addPrompt: 'Add note',
+         removePrompt: 'Remove note #',
+         notFound: 'Note #$ not found',
+         added: `Note '$' was added`,
+         removed: `Note '$' was removed`,
+         removeAll: 'All notes removed'
       }
-
-      return opts;
    }
+
+   // getMenuOpen(){
+   //    const opts = [
+   //       {
+   //          title: `${this.moduleName} ${ Game.menuIndexFormat(`×`) }`,
+   //          action: ()=>this.close()
+   //       },
+   //       {
+   //          title: 'Add note',
+   //          action: ()=>this.add()
+   //       }
+   //    ];
+
+   //    if( this.state.a.length ){
+   //       opts.push({
+   //          title: 'Remove note',
+   //          action: ()=>this.remove()
+   //       });
+   //    }
+
+   //    return opts;
+   // }
 }

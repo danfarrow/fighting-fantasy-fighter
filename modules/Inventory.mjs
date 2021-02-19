@@ -1,103 +1,22 @@
 "use strict";
 
-import AbstractModule from './AbstractModule.mjs';
+import AbstractCollectionModule from './AbstractCollectionModule.mjs';
 
 /**
  * Inventory manager
  */
-export default class Inventory extends AbstractModule {
+export default class Inventory extends AbstractCollectionModule {
    constructor( game ){
       super( game );
-      this.state.a = [];
-   }
 
-   add(){
-      const item = this.prompt( `Add item name` );
-
-      this.state.a.push( item );
-
-      // Autoclose menu item
-      this.close();
-
-      return this.added( item );
-   }
-
-   remove(){
-      const n = this.numberPrompt( `Remove item #` );
-      const item = this.state.a[ n - 1 ];
-
-      if( item === undefined ) {
-         return `Item ${n} not found`;
+      // Custom captions for inventory
+      this.captions = {
+         ...this.captions,
+         addPrompt: 'Add item name',
+         removeMenu: 'Drop item',
+         removeAllMenu: 'Drop all',
+         added: '$ added to inventory',
+         removed: '$ was dropped'
       }
-
-      // Remove item
-      this.state.a = this.arrayPluck( this.state.a, n - 1 );
-
-      // Autoclose menu item
-      this.close();
-      return this.removed( item );
-   }
-
-   // To be overridden by subclass
-   added( item ){ return `${ item } was added to inventory` }
-   removed( item ){ return `${ item } was dropped` }
-
-   /**
-    * Remove all items
-    */
-   removeAll(){
-
-      if( !this.yesNoPrompt( `Are you sure?`) ){
-         return `Cancelled`;
-      }
-
-      this.state.a = [];
-      this.close();
-      return `${ this.moduleName } cleared`;
-   }
-
-   /**
-    * Get view content for this module
-    */
-   getRender(){
-      // If empty then don't render anything
-      if( !this.state.a.length ) return;
-
-      return this.state.a.reduce(
-         ( output, item, i ) => `${output}\n(${i}) ${item}`,
-         `[[${ this.moduleName }]]`
-      );
-   }
-
-   getMenuOpen(){
-
-      // If inventory is empty display
-      // a more verbose `Add item` message
-      const addItemCaption = this.state.a.length ?
-         'Add item' :
-         'Add inventory item';
-
-      const opts = [
-         ...super.getMenuOpen(),
-         {
-            title: addItemCaption,
-            action: ()=>this.add()
-         }
-      ];
-
-      if( this.state.a.length ){
-         opts.push(
-            {
-               title: 'Drop item',
-               action: ()=>this.remove()
-            },
-            {
-               title: 'Drop all…',
-               action: ()=>this.removeAll()
-            }
-         );
-      }
-
-      return opts;
    }
 }

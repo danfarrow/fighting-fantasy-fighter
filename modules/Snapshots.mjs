@@ -1,25 +1,37 @@
 "use strict";
 
-import AbstractModule from "./AbstractModule.mjs";
+import AbstractCollectionModule from './AbstractCollectionModule.mjs';
 import fs from 'fs';
 
 /**
  * Snapshot the game state at a particular location
  */
-export default class Snapshots extends AbstractModule {
+export default class Snapshots extends AbstractCollectionModule {
 
    constructor( game ){
       super( game );
       this.fs = fs;
-      this.state.a = [];
+
+      this.captions = {
+         ...this.captions,
+         addMenu: 'Save snapshot',
+         addMenuVerbose: `Save snapshot`,
+         removeMenu: 'Delete snapshot',
+         removeAllMenu: 'Delete all snapshots',
+         removePrompt: 'Delete snapshot #',
+         notFound: 'Snapshot #$ not found',
+         added: 'Reference $ snapshot saved',
+         removed: 'Snapshot deleted',
+         removeAll: 'All snapshots deleted'
+      }
    }
 
    /**
     * Add a new snapshot as { section, note, state }
     */
    add(){
-      const section = this.numberPrompt( `Current section #` );
-      const note = this.prompt( `Add a note` );
+      const section = this.numberPrompt( `Current reference #` );
+      const note = this.prompt( `Add a description` );
 
       this.state.a.push({
          section: section,
@@ -30,44 +42,6 @@ export default class Snapshots extends AbstractModule {
       // Autoclose menu item
       this.close();
       return this.added( section );
-   }
-
-
-   /**
-    * Remove selected snapshot
-    */
-   remove(){
-      const n = this.numberPrompt( `Remove snapshot #` );
-      const snapshot = this.state.a[n - 1];
-
-      if( !snapshot ) {
-         return `Snapshot ${n} not found`;
-      }
-
-      const section = snapshot.section;
-      this.state.a = this.arrayPluck( this.state.a, n - 1 );
-
-      // Autoclose menu item
-      this.close();
-      return this.removed( section );
-   }
-
-   // @todo Overridden from superclass
-   added( item ){ return `Section ${ item } snapshot saved` };
-   removed( item ){ return `Section ${ item } snapshot removed`; }
-
-   /**
-    * Remove all items
-    */
-   removeAll(){
-
-      if( !this.yesNoPrompt( `Are you sure?` )){
-         return `Cancelled`;
-      }
-
-      this.state.a = [];
-      this.close();
-      return `${ this.moduleName } cleared`;
    }
 
    /**
@@ -143,7 +117,7 @@ export default class Snapshots extends AbstractModule {
       }
 
       if( count ){
-         return `Section ${ section } snapshot restored`;
+         return `Reference ${ section } snapshot restored`;
       }
 
       return `Could not restore snapshot`;
@@ -191,43 +165,29 @@ export default class Snapshots extends AbstractModule {
     * Get open menu config
     */
    getMenuOpen(){
-      const opts = [
-         ...super.getMenuOpen(),
-         {
-            title: "Save snapshot",
-            action: ()=>this.add()
-         }
-      ];
+      const menu = super.getMenuOpen();
 
       // If there are snapshots, add management options
-      if ( this.state.a ){
-         opts.push(
+      if ( this.state.a.length ){
+         menu.push(
             {
-               title: "Restore snapshot",
+               title: 'Restore snapshot',
                action: ()=>this.restore()
-            },
-            {
-               title: "Delete snapshot",
-               action: ()=>this.remove()
-            },
-            {
-               title: "Delete all…",
-               action: ()=>this.removeAll()
             }
          );
       }
 
-      opts.push(
+      menu.push(
          {
-            title: "Export game to disk",
+            title: 'Export game to disk',
             action: ()=>this.export( this.prompt( 'Export filename' ))
          },
          {
-            title: "Import game from disk",
+            title: 'Import game from disk',
             action: ()=>this.import( this.prompt( 'Import filename' ))
          }
       );
 
-      return opts;
+      return menu;
    }
 }
