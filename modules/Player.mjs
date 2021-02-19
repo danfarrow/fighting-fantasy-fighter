@@ -1,6 +1,6 @@
 "use strict";
 
-import Character from "./Character.mjs";
+import Character from './Character.mjs';
 import Game from './Game.mjs';
 
 /**
@@ -217,16 +217,17 @@ export default class Player extends Character {
       if( this.state.attributes.luck < 1 ) {
 
          lucky = false;
-         out.push( "No luck points" );
+         out.push( 'No luck points' );
 
       } else {
 
-         const { total } = this.rollDice();
+         const total = this.game.dice.rollQuiet();
          lucky = total <= this.state.attributes.luck;
          this.setAttr( 'luck', this.getAttr( 'luck' ) - 1 );
 
       }
 
+      this.status.push( this.getLuckAscii( lucky ));
       out.push( lucky ? 'Lucky!' : 'Unlucky!' );
       return returnBool ? lucky : out.join( `\n` );
    }
@@ -234,7 +235,7 @@ export default class Player extends Character {
    /**
     * Return ascii string of lucky / unlucky
     */
-   getLuckAscii(lucky){
+   getLuckAscii( lucky ){
       const out = lucky ?
          [
             " _   _   _  ___ _  ____   __",
