@@ -1,6 +1,6 @@
 "use strict";
 
-import AbstractModule from "./AbstractModule.mjs";
+import AbstractModule from './AbstractModule.mjs';
 
 /**
  * Inventory manager
@@ -74,7 +74,7 @@ export default class Inventory extends AbstractModule {
       const opts = [
          ...super.getMenuOpen(),
          {
-            title: "Add",
+            title: 'Add inventory item',
             action: ()=>this.add()
          }
       ];
@@ -82,11 +82,11 @@ export default class Inventory extends AbstractModule {
       if( this.state.a.length ){
          opts.push(
             {
-               title: "Drop",
+               title: 'Drop',
                action: ()=>this.remove()
             },
             {
-               title: "Drop all…",
+               title: 'Drop all…',
                action: ()=>this.removeAll()
             }
          );

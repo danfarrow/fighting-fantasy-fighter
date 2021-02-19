@@ -18,12 +18,12 @@ export default class Dice extends AbstractModule {
 
       this.alwaysVisible = true;
       this.diceAscii = [
-         [ '⚀', '1' ],
-         [ '⚁', '2' ],
-         [ '⚂', '3' ],
-         [ '⚃', '4' ],
-         [ '⚄', '5' ],
-         [ '⚅', '6' ],
+         [ '⚀' ],
+         [ '⚁' ],
+         [ '⚂' ],
+         [ '⚃' ],
+         [ '⚄' ],
+         [ '⚅' ],
       ];
       //       '┏━━━━━━━┓',
       //       '┃       ┃',

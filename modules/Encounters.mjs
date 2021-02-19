@@ -47,41 +47,30 @@ export default class Encounters extends AbstractModule {
    /**
     * Fight round
     */
-   attack(){
+   attack( opponent ){
+
       // Increment roundCount in log
       this.state.log.roundCount++;
 
       const player = this.player;
       const playerName = player.getName();
-      const opponent = this.player.getOpponent();
       const opponentName = opponent.getName();
 
-      // Roll 2 dice per participant
-      // @todo Check for instant death
+      const {
+         playerAttack,
+         opponentAttack,
+         loser,
+         output
+      } = player.attack( opponent );
 
-      // Get attack strengths
-      const playerAS = player.getAttackStrength( player.rollDice() );
-      const opponentAS = opponent.getAttackStrength( opponent.rollDice() );
-
-      // Damage amount
-      const damage = 2;
-
-      // Add attacks to output
-      const out = [
-         `${ playerName } attack: ${ playerAS }`,
-         `${ opponentName } attack: ${ opponentAS }`
-      ];
-
-      if( playerAS < opponentAS ){
-
-         // Player was wounded
-         out.push( player.damage( damage ));
+      if( loser === player ){
 
          // Set 'use luck' functions
          this.useLuckConfig = {
             title: 'Use luck to reduce injury',
-            lucky: ()=> player.heal( 1 ),
-            unlucky: ()=> player.damage( 1 )
+            opponent: opponent,
+            lucky: ()=> this.player.heal( 1 ),
+            unlucky: ()=> this.player.damage( 1 )
          };
 
          // Player died
@@ -89,15 +78,12 @@ export default class Encounters extends AbstractModule {
             return this.lose( opponent );
          }
 
-      } else if( playerAS > opponentAS ){
-
-         // Opponent was wounded
-         // Instant Death removes all stamina
-         out.push( opponent.damage( damage ) );
+      } else if( loser === opponent ){
 
          // Set 'use luck' functions
          this.useLuckConfig = {
             title: "Use luck to increase damage",
+            opponent: opponent,
             lucky: ()=> opponent.damage( 2 ),
             unlucky: ()=> opponent.heal( 1 )
          };
@@ -110,44 +96,46 @@ export default class Encounters extends AbstractModule {
       } else {
 
          // Nobody wounded
-         out.push( `Miss!` );
+         output.push( `Miss!` );
 
       };
 
-      return out.join( `\n` );
+      return output.join( `\n` );
    }
 
    /**
     * Execute damage adjustment function based on luck
     */
-   useLuck(){
+   useLuck( opponent ){
 
       if( !this.useLuckConfig ) return;
 
-      // Copy luck config
+      // Copy & delete useLuckConfig
+      // @todo Use `delete`?
       const luckConfig = this.useLuckConfig;
       this.useLuckConfig = null;
 
       // Get boolean luck test result
       const lucky = this.player.testLuck( true );
       const ascii = this.player.getLuckAscii( lucky );
+      const output = [];
 
       if( lucky ) {
-         return `${ ascii }\n`
-            + luckConfig.lucky();
+         output.push( ascii, luckConfig.lucky() );
       } else {
-         return `${ ascii }\n`
-            + luckConfig.unlucky();
+         output.push( ascii, luckConfig.unlucky() );
       }
 
-   }
+      // @todo Check for player / opponent death
+      if( this.player.isDead() ){
+         return this.lose( opponent );
+      }
 
-   /**
-    * Return attack strength (2 dice + skill)
-    * @todo Check for double / instant death
-    */
-   getAttackStrength( diceRoll ){
-      return diceRoll + this.getAttr( 'skill' );
+      if( opponent.isDead() ){
+         return this.win( opponent );
+      }
+
+      return output.join( `\n` );
    }
 
    /**
@@ -216,53 +204,27 @@ export default class Encounters extends AbstractModule {
    }
 
    /**
-    * If an encounter is in progress
-    * show opponent name in menu
-    */
-   // getMenuClosed(){
-   //    const opponent = this.player.getOpponent();
-   //    const menu = [];
-
-   //    opponent && opponent.isAlive() ? menu.push(
-   //       {
-   //          title: `Attack ${ opponent.getName() }`,
-   //          action: ()=> this.attack()
-   //       },
-   //       {
-   //          title: `Encounters…`,
-   //          action: ()=> this.open()
-   //       }
-   //    ) : menu.push(
-   //       {
-   //          title: `Start encounter`,
-   //          action: ()=> this.start()
-   //       },
-   //       {
-   //          title: `Encounters…`,
-   //          action: ()=> this.open()
-   //       }
-   //    );
-
-   //    return menu;
-   // }
-
-   /**
     * Get menu config when module menu is open
     */
    getMenuOpen(){
 
-      const canUseLuck = this.player.getAttr( 'luck' ) > 0;
+      // If no player luck then delete `this.useLuckConfig`
+      if( this.player.getAttr( 'luck' ) < 1 ) {
+         this.useLuckConfig = null;
+      }
+
       const opponent = this.player.getOpponent();
       const menu = [ ...super.getMenuOpen() ];
 
 
       // Menu differs depending on whether an
       // encounter is in progress
+      // @todo opponent.isDead check shoudn't be needed
       if( !opponent || opponent.isDead() ){
          menu.push(
             {
                title: `Start encounter`,
-               action: ()=>this.start()
+               action: ()=> this.start()
             }
          )
 
@@ -278,36 +240,33 @@ export default class Encounters extends AbstractModule {
          }
 
       } else {
-         // An encounter is in progress - add `Attack...`,
-         // `Use luck` (if available), `End encounter`
+
+         // Encounter in progress. Add `Attack...`, `End encounter`,
+         // `Use luck to reduce/increase damage` (if available)
          // & opponent attribute menu items
          menu.push(
             {
                title: `Attack ${ opponent.getName() }`,
-               action: ()=> this.attack()
+               action: ()=> this.attack( opponent )
             },
             {
                title: `Add opponent`,
                action: ()=> this.player.addOpponent()
-            }
-         );
-
-         if( this.useLuckConfig && canUseLuck ){
-            menu.push(
-               {
-                  title: this.useLuckConfig.title,
-                  action: ()=> this.useLuck()
-               }
-            )
-         }
-
-         menu.push(
+            },
             {
                title: `Escape encounter`,
                action: ()=>this.escape( opponent )
             }
          );
 
+         if( this.useLuckConfig ){
+            menu.push(
+               {
+                  title: this.useLuckConfig.title,
+                  action: ()=> this.useLuck( this.useLuckConfig.opponent )
+               }
+            )
+         }
       }
 
       return menu;

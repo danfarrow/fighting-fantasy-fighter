@@ -60,6 +60,7 @@ export default class Player extends Character {
       this.opponent = opponent;
 
       // Push character module as module #2, after player
+      // @todo This should happen in Game
       const player = this.game.modules.shift();
       this.game.modules.unshift( opponent );
       this.game.modules.unshift( player );
@@ -68,6 +69,41 @@ export default class Player extends Character {
       this.state.opponentState = this.opponent.state;
 
       return opponent;
+   }
+
+   /**
+    * Attack the supplied opponent
+    */
+   attack( opponent ){
+
+      // Get attack strengths
+      const { total: playerRoll, isDouble, rolls: playerRolls } = this.rollDice();
+      const { total: opponentRoll, rolls: opponentRolls } = opponent.rollDice();
+
+      // @todo Check `isDouble` for instant Death
+
+      const playerAttack = this.getAttackStrength( playerRoll );
+      const opponentAttack = opponent.getAttackStrength( opponentRoll );
+
+      // Damage amount
+      const damage = 2;
+
+      // Add attacks to output
+      const output = [
+         `${ this.getName() } attack: ${ playerAttack } [${ playerRolls.join(' ') }]`,
+         `${ opponent.getName() } attack: ${ opponentAttack } [${ opponentRolls.join(' ') }]`
+      ];
+
+      // Check for miss, or calculate loser
+      let loser;
+      if( playerAttack === opponentAttack ){
+         loser = null;
+      } else {
+         loser = playerAttack < opponentAttack ? this : opponent;
+         output.push( loser.damage( damage ));
+      }
+
+      return { playerAttack, opponentAttack, loser, output }
    }
 
    /**
@@ -112,9 +148,10 @@ export default class Player extends Character {
 
 
       // Push character as second module, after player
-      this.game.modules.shift();
+      // @todo This should happen in Game
+      const player = this.game.modules.shift();
       this.game.modules.unshift( opponent );
-      this.game.modules.unshift( this );
+      this.game.modules.unshift( player );
 
       // Now overwrite local state with opponent's state obj
       this.state.opponentState = {...opponent.state};
@@ -157,8 +194,8 @@ export default class Player extends Character {
 
       } else {
 
-         const diceValue = this.rollDice();
-         lucky = diceValue <= this.state.attributes.luck;
+         const { total } = this.rollDice();
+         lucky = total <= this.state.attributes.luck;
          this.setAttr( 'luck', this.getAttr( 'luck' ) - 1 );
 
       }
@@ -197,11 +234,6 @@ export default class Player extends Character {
    getMenu(){
 
       const menu = super.getMenuOpen();
-      //    {
-      //       title: `Roll dice`,
-      //       action: ()=> `You rolled ${ this.rollDice() }`
-      //    }
-      // ];
 
       if( this.getAttr('luck') > 0 ){
 

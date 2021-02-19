@@ -19,7 +19,7 @@ export default class Menu {
     */
    prompt(msg){
       return this.promptObj(
-         Game.promptFormat( this.game.indent + msg )
+         Game.promptFormat( Game.indent + msg )
       );
    }
 

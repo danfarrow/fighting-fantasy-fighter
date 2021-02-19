@@ -32,10 +32,12 @@ export default class Game {
    static promptFormat = clc.xterm(45).bold;// Vivid blue
    static menuIndexFormat = clc.xterm(45);// Vivid blue
 
+   static indent = ` `.repeat( 4 );
+
    constructor(){
 
-      // Output indentation
-      this.indent = ` `.repeat( 4 );
+      // Indentation
+      // this.indent = ` `.repeat( 4 );
 
       // Instantiate modules
       this.menu = new Menu( this );
@@ -150,7 +152,7 @@ export default class Game {
 
       // Indent output
       const regex = /\n/gi;
-      console.log( this.indent + txt.replace( regex, `\n${ this.indent }`) );
+      console.log( Game.indent + txt.replace( regex, `\n${ Game.indent }`) );
    }
 
    /**

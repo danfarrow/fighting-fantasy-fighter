@@ -15,7 +15,7 @@ export default class AbstractModule {
       this.moduleName = this.constructor.name;
 
       this.game = game;
-      this.indent = game.indent
+      this.indent = Game.indent
 
       // State is used to export & import snapshots
       this.state = {}
@@ -52,16 +52,25 @@ export default class AbstractModule {
    }
 
    /**
-    * Number prompt
+    * Number prompt - accepts a second paramater
+    * which enables relative inputs e.g. `+1` will
+    * return the value n + 1
     */
-   numberPrompt( msg = `Please enter a number` ){
+   numberPrompt( msg = `Please enter a number`, n = null ){
+
       const input = this.prompt( `${msg}` );
 
       // Empty input cancels
       if( '' === input ) return;
 
+      const relative = [ '-', '+' ].includes( input.charAt(0) );
       const number = parseInt( input );
-      return isNaN( number ) ? this.numberPrompt() : number;
+
+      if( isNaN( number ) ) { return this.numberPrompt( undefined, n ) }
+
+      if( relative && n !== null ) { return n + number }
+
+      return number;
    }
 
    /**
@@ -167,6 +176,12 @@ export default class AbstractModule {
     * Placeholder methods for subclasses to overwrite
     */
    getMenuClosed(){
+
+      // If menu open only has one entry then use that instead
+      const menuOpen = this.getMenuOpen();
+      if( menuOpen.length === 2 ){
+         return [ menuOpen[1] ];
+      }
 
       // For subclasses that have an array of items
       // i.e. Inventory, Snapshots, Notes

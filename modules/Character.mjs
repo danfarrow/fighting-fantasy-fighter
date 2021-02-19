@@ -94,7 +94,7 @@ export default class Character extends AbstractModule {
 
       return 'name' === attr ?
          this.prompt( caption )
-         : this.numberPrompt( caption );
+         : this.numberPrompt( caption, this.getAttr( attr ));
    }
 
    /**
@@ -194,9 +194,17 @@ export default class Character extends AbstractModule {
     * Roll 2 dice for this character
     */
    rollDice(){
-      const dice = [ this.game.dice.roll(1), this.game.dice.roll(1) ];
-//      this.status.push( this.game.dice.getAscii( dice, this.format ));
-      return dice.reduce(( t, n ) => t + n );
+      const roll1 = this.game.dice.roll(1);
+      const roll2 = this.game.dice.roll(1);
+      const rolls = [ roll1, roll2 ];
+      const isDouble = roll1 === roll2;
+      const total = roll1 + roll2;
+
+      return {
+         rolls: rolls,
+         isDouble: isDouble,
+         total: total
+      };
    }
 
    /**
@@ -235,7 +243,6 @@ export default class Character extends AbstractModule {
 
       // Add post-render function to remove this module
       this.postRenderQueue.push( ()=> this.game.removeModule( this ));
-
       return `${ n } is dead!`
    }
 
