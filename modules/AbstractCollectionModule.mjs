@@ -11,6 +11,7 @@ export default class AbstractCollectionModule extends AbstractModule {
    constructor( game ){
       super( game );
       this.state.a = [];
+      this.allowAddMultiple = false;
 
       this.captions = {
          addMenu: 'Add item',
@@ -26,17 +27,37 @@ export default class AbstractCollectionModule extends AbstractModule {
       }
    }
 
-   add(){
+   /**
+    * Prompt user for item to add to collection
+    */
+   add( itemsAdded = [] ){
       const item = this.prompt( this.captions.addPrompt );
 
-      this.state.a.push( item );
+
+      if( '' !== item) {
+         this.state.a.push( item );
+         itemsAdded.push( item );
+
+         // Allow adding multiple items until empty entry
+         if( this.allowAddMultiple ){
+            return this.add( itemsAdded );
+         }
+      }
 
       // Autoclose menu item
       this.close();
 
-      return this.added( item );
+      // Status caption
+      const caption = itemsAdded.length <= 3 ?
+         itemsAdded.join( `, ` ) :
+         `${ itemsAdded.length } items`;
+
+      return this.added( caption );
    }
 
+   /**
+    * Prompt user for item to remove from collection
+    */
    remove(){
       const n = this.numberPrompt( this.captions.removePrompt );
       const item = this.state.a[ n - 1 ];
@@ -54,7 +75,7 @@ export default class AbstractCollectionModule extends AbstractModule {
       return this.removed( item );
    }
 
-   // To be overridden by subclass
+   // Captions to display following item add / remove
    added( item ){ return this.captions.added.replace( '$', item ) }
    removed( item ){ return this.captions.removed.replace( '$', item ) }
 
