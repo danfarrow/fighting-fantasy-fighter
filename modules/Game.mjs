@@ -19,14 +19,14 @@ export default class Game {
 
    // Colour reference is here https://www.npmjs.com/package/cli-color
    static strikeFormat = clc.strike;
-   static moduleTitleFormat = clc.xterm(116).bgXterm(31).bold;// Turquoise on blue
+   static moduleTitleFormat = clc.xterm(15).bgXterm(31);// White on blue
    static lowKeyFormat = clc.xterm(243).italic;// Light grey
-   static highKeyFormat = clc.xterm(190);// Lime green
-   static statusFormat = clc.xterm(190).italic;// Lime green
-   static playerFormat = clc.xterm(198);// Pinky red
-   static playerHeaderFormat = clc.xterm(0).bgXterm(198);
-   static opponentFormat = clc.xterm(190);// Lime green
-   static opponentHeaderFormat = clc.xterm(0).bgXterm(190);
+   static highKeyFormat = clc.xterm(15).bold;// White
+   static statusFormat = clc.xterm(226).italic;// Yellow
+   static playerFormat = clc.xterm(31);
+   static playerHeaderFormat = clc.xterm(15).bgXterm(31);
+   static opponentFormat = clc.xterm(94);// Brown
+   static opponentHeaderFormat = clc.xterm(15).bgXterm(94);
    static characterDamageFormat = clc.xterm(9);// Red fg
    static characterDamageHeaderFormat = clc.xterm(0).bgXterm(9);// Red bg
    static promptFormat = clc.xterm(45).bold;// Vivid blue
