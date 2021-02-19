@@ -22,13 +22,14 @@ export default class Game {
    static moduleTitleFormat = clc.xterm(15).bgXterm(31);// White on blue
    static lowKeyFormat = clc.xterm(243).italic;// Light grey
    static highKeyFormat = clc.xterm(15).bold;// White
-   static statusFormat = clc.xterm(226).italic;// Yellow
+   static statusFormat = clc.xterm(11).italic;// Yellow
    static playerFormat = clc.xterm(31);
    static playerHeaderFormat = clc.xterm(15).bgXterm(31);
-   static opponentFormat = clc.xterm(94);// Brown
-   static opponentHeaderFormat = clc.xterm(15).bgXterm(94);
-   static characterDamageFormat = clc.xterm(9);// Red fg
-   static characterDamageHeaderFormat = clc.xterm(0).bgXterm(9);// Red bg
+   static opponentFormat = clc.xterm(11);// Yellow
+   static opponentHeaderFormat = clc.xterm(0).bgXterm(11);
+   static characterDamageFormat = clc.xterm(197);// Red fg
+   static characterDamageHeaderFormat = clc.xterm(0).bgXterm(197);// Red bg
+   static instantDeathFormat = clc.xterm(15);// White
    static promptFormat = clc.xterm(45).bold;// Vivid blue
    static menuIndexFormat = clc.xterm(45);// Vivid blue
 

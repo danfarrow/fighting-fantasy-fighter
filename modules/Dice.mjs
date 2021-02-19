@@ -13,55 +13,45 @@ export default class Dice extends AbstractModule {
       // Dice module not exported
       delete this.state;
 
-      // Was the last throw a double?
-      this.double = false;
-
-      this.alwaysVisible = true;
       this.diceAscii = [
-         [ '⚀' ],
-         [ '⚁' ],
-         [ '⚂' ],
-         [ '⚃' ],
-         [ '⚄' ],
-         [ '⚅' ],
+         [
+            '┏━━━━━━━┓',
+            '┃       ┃',
+            '┃   •   ┃',
+            '┃       ┃',
+            '┗━━━━━━━┛'
+         ],[
+            '┏━━━━━━━┓',
+            '┃  •    ┃',
+            '┃       ┃',
+            '┃    •  ┃',
+            '┗━━━━━━━┛'
+         ],[
+            '┏━━━━━━━┓',
+            '┃ •     ┃',
+            '┃   •   ┃',
+            '┃     • ┃',
+            '┗━━━━━━━┛'
+         ],[
+            '┏━━━━━━━┓',
+            '┃ •   • ┃',
+            '┃       ┃',
+            '┃ •   • ┃',
+            '┗━━━━━━━┛'
+         ],[
+            '┏━━━━━━━┓',
+            '┃ •   • ┃',
+            '┃   •   ┃',
+            '┃ •   • ┃',
+            '┗━━━━━━━┛'
+         ],[
+            '┏━━━━━━━┓',
+            '┃ •   • ┃',
+            '┃ •   • ┃',
+            '┃ •   • ┃',
+            '┗━━━━━━━┛'
+         ]
       ];
-      //       '┏━━━━━━━┓',
-      //       '┃       ┃',
-      //       '┃   •   ┃',
-      //       '┃       ┃',
-      //       '┗━━━━━━━┛'
-      //    ],[
-      //       '┏━━━━━━━┓',
-      //       '┃  •    ┃',
-      //       '┃       ┃',
-      //       '┃    •  ┃',
-      //       '┗━━━━━━━┛'
-      //    ],[
-      //       '┏━━━━━━━┓',
-      //       '┃ •     ┃',
-      //       '┃   •   ┃',
-      //       '┃     • ┃',
-      //       '┗━━━━━━━┛'
-      //    ],[
-      //       '┏━━━━━━━┓',
-      //       '┃ •   • ┃',
-      //       '┃       ┃',
-      //       '┃ •   • ┃',
-      //       '┗━━━━━━━┛'
-      //    ],[
-      //       '┏━━━━━━━┓',
-      //       '┃ •   • ┃',
-      //       '┃   •   ┃',
-      //       '┃ •   • ┃',
-      //       '┗━━━━━━━┛'
-      //    ],[
-      //       '┏━━━━━━━┓',
-      //       '┃ •   • ┃',
-      //       '┃ •   • ┃',
-      //       '┃ •   • ┃',
-      //       '┗━━━━━━━┛'
-      //    ]
-      // ];
 
    }
 
@@ -69,14 +59,14 @@ export default class Dice extends AbstractModule {
    getMenuClosed(){ return [
       {
          title: 'Roll dice',
-         action: ()=> this.roll(2)
+         action: ()=> this.roll( 2 )
       }
    ] }
 
    /**
-    * Roll n dice
+    * Roll n dice and return total
     */
-   roll( n = 1 ){
+   rollQuiet( n = 1 ){
       const diceThrows = [];
 
       while(n--){
@@ -87,9 +77,27 @@ export default class Dice extends AbstractModule {
    }
 
    /**
+    * Roll 2 dice
+    */
+   roll(){
+      const roll1 = this.rollQuiet(1);
+      const roll2 = this.rollQuiet(1);
+      const rolls = [ roll1, roll2 ];
+      const ascii = this.getAscii( rolls );
+      const isDouble = roll1 === roll2;
+      const total = roll1 + roll2;
+      return {
+         rolls,
+         ascii,
+         isDouble,
+         total
+      };
+   }
+
+   /**
     * Render supplied numbers as ascii dice
     */
-   getAscii( numbers, format = Game.playerFormat ){
+   getAscii( numbers ){
       let asciiArr;
 
       for(let i of numbers){
@@ -102,6 +110,6 @@ export default class Dice extends AbstractModule {
          }
       }
 
-      return format( asciiArr.join(`\n`) );
+      return asciiArr.join(`\n`);
    }
 }

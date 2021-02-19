@@ -90,6 +90,8 @@ export default class Encounters extends AbstractModule {
 
          // Opponent died
          if( opponent.isDead() ) {
+            // Remove `injured` message
+            output.pop();
             return `${ output.join( `\n` ) }\n${ this.win( opponent ) }`;
          }
 

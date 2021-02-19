@@ -73,6 +73,8 @@ export default class Player extends Character {
 
    /**
     * Attack the supplied opponent
+    *
+    * @todo Still messy
     */
    attack( opponent ){
       // Instant Death rule: if player throws a double, opponent dies
@@ -82,12 +84,14 @@ export default class Player extends Character {
       const {
          total: playerAttack,
          isDouble,
-         status: playerStatus
+         status: playerStatus,
+         ascii: playerAscii
       } = this.getAttackStrength();
 
       const {
          total: opponentAttack,
-         status: opponentStatus
+         status: opponentStatus,
+         ascii: opponentAscii
       } = opponent.getAttackStrength();
 
       // Damage amount
@@ -96,7 +100,15 @@ export default class Player extends Character {
       // Add attacks to output
       const output = [ playerStatus, opponentStatus ];
 
+      // Check for Instant Death
       if( isDouble && instantDeathRule ){
+
+         // Show special ascii dice
+         this.status.push( Game.instantDeathFormat( playerAscii ) );
+
+         // Replace attack strengths output
+         output.pop();
+         output.pop();
          output.push(
             'INSTANT DEATH',
             opponent.damage( opponent.getAttr( 'stamina' ))
@@ -113,6 +125,10 @@ export default class Player extends Character {
          loser = playerAttack < opponentAttack ? this : opponent;
          output.push( loser.damage( damage ));
       }
+
+      // Show colour formatted dice rolls
+      this.status.push( this.format( playerAscii ) );
+      opponent.status.push( opponent.format( opponentAscii ));
 
       return { playerAttack, opponentAttack, loser, output }
    }
