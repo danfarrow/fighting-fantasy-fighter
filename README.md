@@ -19,7 +19,7 @@ I also wanted to build a node CLI app with OOP & native JavaScript modules. This
 * Export / import entire game state, including snapshots, as JSON
 * Prompts user for bookmark on quit & autosaves game state as `autosave.json`
 
-[![asciicast](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq.svg)](https://asciinema.org/a/NyuH60uscxmMojHMget8f0Itq)
+[![asciicast](https://asciinema.org/a/393248.svg)](https://asciinema.org/a/393248)
 
 ![Screengrab of the app](./fff-grab.png)
 
