@@ -41,6 +41,7 @@ export default class Snapshots extends AbstractCollectionModule {
 
       // Autoclose menu item
       this.close();
+
       return this.added( section );
    }
 
@@ -82,11 +83,20 @@ export default class Snapshots extends AbstractCollectionModule {
     */
    getGameState( skipSelf = true ){
       const out = {};
+      let characterCount = 0;
 
       for( const module of this.game.modules ){
+
          if( !module.state ) continue;
          if( skipSelf && module === this ) continue;
          const json = JSON.stringify( module.state );
+
+         // Support mutiple Character modules
+         if( 'Character' === module.moduleName ){
+            out[ `Character-${ characterCount++ }` ] = JSON.parse( json );
+            continue;
+         }
+
          out[ module.moduleName ] = JSON.parse( json );
       }
 
@@ -98,29 +108,29 @@ export default class Snapshots extends AbstractCollectionModule {
     */
    restoreGameState( snapshot ){
 
+      // Restore state to instantiated modules
       const section = snapshot.section;
-      let count = 0;
 
-      for( const module of this.game.modules ){
-         const modName = module.moduleName;
+      for( const gameModule of this.game.modules ){
+         const modName = gameModule.moduleName;
 
          // Check if module exists in snapshot
          if( !snapshot.state[ modName ] ) continue;
 
-         module.state = snapshot.state[ modName ];
-         count++;
+         gameModule.state = snapshot.state[ modName ];
       }
 
-      // Call `postRestore` hook on all modules
-      for( const module of this.game.modules ){
-         module.postRestore();
-      }
+      // Restore opponent Characters from state objects
+      const opponents = [];
 
-      if( count ){
-         return `Reference ${ section } snapshot restored`;
+      for( const modName in snapshot.state ){
+         if( modName.indexOf( 'Character-' ) > -1 ){
+            opponents.push( snapshot.state[ modName ] );
+         }
       }
+      this.game.restoreOpponents( opponents );
 
-      return `Could not restore snapshot`;
+      return `Reference ${ section } snapshot restored`;
 
    }
 

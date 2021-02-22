@@ -11,23 +11,20 @@ export default class Player extends Character {
    constructor( game ){
 
       // Randomise attributes
-      const skillFunc = ()=> game.dice.roll(2) + 6;
-      const stamFunc = ()=> game.dice.roll(2) + 12
-      const luckFunc = ()=> game.dice.roll(1) + 6;
-      const goldFunc = ()=> 0;
+      const skillFunc = ()=> game.dice.rollQuiet( 2 ) + 6;
+      const stamFunc = ()=> game.dice.rollQuiet( 2 ) + 12
+      const luckFunc = ()=> game.dice.rollQuiet( 1 ) + 6;
 
       const skill = skillFunc();
       const stamina = stamFunc();
       const luck = luckFunc();
-      const gold = goldFunc();
 
       super( game, 'Anonymous Player', skill, stamina );
 
       // Add extra player attributes
       const a = this.state.attributes = {
          ...this.state.attributes,
-         luck: luck,
-         gold: gold
+         luck: luck
       }
 
       // Add initial value for luck
@@ -36,44 +33,17 @@ export default class Player extends Character {
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.playerFormat;
       this.headerFormat = Game.playerHeaderFormat;
-   }
 
-   /**
-    * Fix opponent getting initialised
-    * during menu render, when Encounters
-    * calls `player.getOpponent()`
-    */
-   postRestore(){
-      this.getOpponent();
-   }
-
-   /**
-    * Add opponent
-    */
-   addOpponent(){
-
-      const opponent = new Character( this.game );
-
-      this.opponent = opponent;
-
-      // Push character module as module #2, after player
-      // @todo This should happen in Game
-      const player = this.game.modules.shift();
-      this.game.modules.unshift( opponent );
-      this.game.modules.unshift( player );
-
-      // Store reference to opponent state in local state
-      this.state.opponentState = this.opponent.state;
-
-      return opponent;
+      // this.opponents = [];
+      // this.state.opponentStates = [];
    }
 
    /**
     * Attack the supplied opponent
-    *
-    * @todo Still messy
+    * defend against other opponents
     */
-   attack( opponent ){
+   attack( opponent, otherOpponents = [] ){
+
       // Instant Death rule: if player throws a double, opponent dies
       const instantDeathRule = true;
 
@@ -116,70 +86,23 @@ export default class Player extends Character {
 
       // Check for miss, or calculate loser
       let loser;
+
       if( playerAttack === opponentAttack ){
+
          loser = null;
+
       } else {
+
          loser = playerAttack < opponentAttack ? this : opponent;
          output.push( loser.damage( damage ));
+
       }
 
       // Show colour formatted dice rolls
-      this.status.push( this.format( playerAscii ) );
+      this.status.push( this.format( playerAscii ));
       opponent.status.push( opponent.format( opponentAscii ));
 
       return { playerAttack, opponentAttack, loser, output }
-   }
-
-   /**
-    * Remove opponent
-    */
-   onEncounterEnd( opponent ){
-      this.opponent = null;
-      this.state.opponentState = null;
-   }
-
-   /**
-    * Return opponent or instantiate from this.state
-    */
-   getOpponent(){
-
-      if( !this.opponent ){
-
-         // Attempt to restore from stored state
-         const opponent = this.restoreOpponent();
-         if( !opponent ) return;
-
-         this.opponent = opponent;
-      }
-
-      return this.opponent;
-   }
-
-   /**
-    * Restore opponent from stored state
-    */
-   restoreOpponent(){
-
-      if( !this.state.opponentState ) return;
-
-      // Instantiate opponent with copy of stored state
-      const opponent = new Character(
-         this.game,
-         this.state.opponentState.attributes.name,
-         this.state.opponentState.attributes.skill,
-         this.state.opponentState.attributes.stamina
-      );
-
-
-      // Push character as second module, after player
-      // @todo This should happen in Game
-      const player = this.game.modules.shift();
-      this.game.modules.unshift( opponent );
-      this.game.modules.unshift( player );
-
-      // Now overwrite local state with opponent's state obj
-      this.state.opponentState = {...opponent.state};
-      return opponent;
    }
 
    /**
@@ -200,7 +123,7 @@ export default class Player extends Character {
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
       const v = this.state.attributes[attr];
       const limit = this.state.initialValues[attr];
-      return `${ attrName } ${ Game.lowKeyFormat( `[${ v }/${ limit }]` ) }`;
+      return `${ attrName } {${ v }/${ limit }}`;
    }
 
    /**
@@ -266,7 +189,7 @@ export default class Player extends Character {
       if( this.getAttr('luck') > 0 ){
 
          const luck = this.getAttr('luck');
-         const luckCount = Game.lowKeyFormat( `[${ luck }]` );
+         const luckCount = `{${ luck }}`;
 
          menu.push(
             {

@@ -8,16 +8,19 @@ import Game from './Game.mjs';
  */
 export default class Character extends AbstractModule {
 
-   constructor( game, name, skill, stamina ){
+   constructor( game, nameOrState, skill, stamina ){
 
       super( game );
 
-      this.state.attributes = {};
-      // this.state.initialValue = {};
-
-      this.setAttr( 'name', name || this.prompt( 'Opponent name' ));
-      this.setAttr( 'skill', skill !== undefined ? skill : this.numberPrompt( 'Opponent skill' ));
-      this.setAttr( 'stamina', stamina !== undefined ? stamina : this.numberPrompt( 'Opponent stamina' ));
+      if( typeof nameOrState === 'object' ){
+         // Restore character from supplied state obj
+         this.state = { ...nameOrState };
+      } else {
+         this.state.attributes = {};
+         this.setAttr( 'name', nameOrState || this.prompt( 'Opponent name' ));
+         this.setAttr( 'skill', skill !== undefined ? skill : this.numberPrompt( 'Opponent skill' ));
+         this.setAttr( 'stamina', stamina !== undefined ? stamina : this.numberPrompt( 'Opponent stamina' ));
+      }
 
       // Character info always displays
       this.alwaysVisible = true;
@@ -55,7 +58,13 @@ export default class Character extends AbstractModule {
     * Return name struck out if dead
     */
    getName(){
-      return this.getAttr( 'name' );
+      const n = this.getAttr( 'name' );
+
+      if( this.isAlive() ){
+         return n;
+      }
+
+      return `×${ Game.strikeFormat( n ) }×`;
    }
 
    /**
@@ -83,9 +92,24 @@ export default class Character extends AbstractModule {
    }
 
    /**
+    * Add a new attribute
+    */
+   addAttr( attr ){
+
+      if( this.state.attributes[ attr ] ){
+         return 'Attribute already exists';
+      }
+
+      const value = this.numberPrompt( `Set ${ attr.toLowerCase() }` );
+
+      return this.setAttr( attr, value );
+   }
+
+   /**
     * Prompt for input to set attribute value
     */
-   getAttrPrompt(attr){
+   getPromptToSetAttr( attr ){
+
       const caption = `Set ${ this.getAttrCaption( attr ) }`;
 
       return 'name' === attr ?
@@ -101,11 +125,13 @@ export default class Character extends AbstractModule {
       attr = attr.toLowerCase();
 
       // Check for attribute in state, whilst respecting zero values
-      if( !Object.keys( this.state.attributes ).includes( attr ) ) return;
+      if( !Object.keys( this.state.attributes ).includes( attr ) ){
+         return attr;
+      }
 
       const attrValue = this.state.attributes[ attr ];
       const attrName = capitalise ? this.capitaliseFirst( attr ) : attr;
-      return `${ attrName } ${ Game.lowKeyFormat( `[${ attrValue }]` )}`;
+      return `${ attrName } {${ attrValue }}`;
    }
 
    /**
@@ -114,7 +140,6 @@ export default class Character extends AbstractModule {
    getMenuTitle(){
       return this.getAttr( 'name' );
    }
-
 
    /**
     * Populate menu in open state
@@ -127,10 +152,17 @@ export default class Character extends AbstractModule {
          menu.push(
             {
                title: this.getAttrCaption( attr, true ),
-               action: ()=> this.setAttr( attr, this.getAttrPrompt( attr ))
+               action: ()=> this.setAttr( attr, this.getPromptToSetAttr( attr ))
             }
          );
       }
+
+      menu.push(
+         {
+            title: 'Add attribute',
+            action: ()=> this.addAttr( this.prompt( 'Attribute name' ))
+         }
+      );
 
       return [
          ...super.getMenuOpen(),
@@ -150,11 +182,11 @@ export default class Character extends AbstractModule {
       const staminaString =
          this.format( '♥ '.repeat( stamina )) +
          '♡ '.repeat( stamLost ) +
-         Game.lowKeyFormat( `[${ stamina }]` );
+         `{${ stamina }}`;
 
       const skillString =
          this.format( '⚔ '.repeat( skill )) +
-         Game.lowKeyFormat( `[${ skill }]` );
+         `{${ skill }}`;
 
       const out = [ this.headerFormat( ` ${ this.getName() } ` ) ];
       out.push( skillString );

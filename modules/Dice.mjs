@@ -1,7 +1,6 @@
 "use strict";
 
 import AbstractModule from "./AbstractModule.mjs";
-import Game from "./Game.mjs";
 
 /**
  * Simple dice roll with ascii display

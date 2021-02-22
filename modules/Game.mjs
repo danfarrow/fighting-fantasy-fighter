@@ -2,20 +2,22 @@
 
 import fs from 'fs';
 import clc from 'cli-color';
-import Dice from "./Dice.mjs";
-import Menu from "./Menu.mjs";
-import Notes from "./Notes.mjs";
-import Player from "./Player.mjs";
-import Inventory from "./Inventory.mjs";
-import Snapshots from "./Snapshots.mjs";
-import Encounters from "./Encounters.mjs";
+import Dice from './Dice.mjs';
+import Menu from './Menu.mjs';
+import Notes from './Notes.mjs';
+import Player from './Player.mjs';
+import Character from './Character.mjs';
+import Inventory from './Inventory.mjs';
+import Snapshots from './Snapshots.mjs';
+import Encounters from './Encounters.mjs';
+
+// https://www.npmjs.com/package/prompt-sync
+import Prompt from 'prompt-sync';
 
 /**
  * Game manager
  */
 export default class Game {
-
-   static colWidth = 60;// Set width for centering / padding
 
    // Colour reference is here https://www.npmjs.com/package/cli-color
    static strikeFormat = clc.strike;
@@ -33,16 +35,17 @@ export default class Game {
    static promptFormat = clc.xterm(45).bold;// Vivid blue
    static menuIndexFormat = clc.xterm(45);// Vivid blue
 
+   // Indentation
    static indent = ` `.repeat( 4 );
 
    constructor(){
 
-      // Indentation
-      // this.indent = ` `.repeat( 4 );
+      // Prompt used to get user input
+      this.promptObj = new Prompt({ sigint: true });
 
       // Instantiate modules
-      this.menu = new Menu( this );
       this.dice = new Dice( this );
+      this.menu = new Menu( this );
       this.notes = new Notes( this );
       this.player = new Player( this );
       this.inventory = new Inventory( this );
@@ -62,7 +65,13 @@ export default class Game {
       this.snapshots.import( 'autosave' );
 
       // Greet player
-      this.status = `Welcome ${ this.player.getName() }!`;
+      this.status = `Welcome ${ this.player.getName() }`;
+      const currentRef = this.player.getAttr( 'reference' );
+
+      if( currentRef ) {
+         delete this.player.state.attributes.reference;
+         this.status += `\n{Last reference: ${ currentRef }}`;
+      }
 
       //Start input loop
       this.start();
@@ -122,6 +131,53 @@ export default class Game {
    }
 
    /**
+    * Register a new opponent
+    */
+   registerOpponent( opponent ){
+      // Push character module as module #2, after player
+      const player = this.modules.shift();
+      this.modules = [ player, opponent, ...this.modules ];
+   }
+
+   /**
+    * Restore an opponent from snapshot state object
+    */
+   restoreOpponents( statesArray ){
+
+      // Reverse states
+      statesArray = statesArray.reverse();
+
+      for( const state of statesArray ){
+         this.registerOpponent( new Character( this, state ));
+      }
+   }
+
+   /**
+    * Return array of current Character modules
+    */
+   getOpponents(){
+      return this.modules.reduce(
+         ( opponents, module ) => {
+            if(
+               module instanceof Character &&
+               module !== this.player
+            ){
+               opponents.push( module )
+            }
+            return opponents;
+         },
+         []
+      )
+   }
+
+   /**
+    * Return number of current opponents
+    */
+   getOpponentCount(){
+      return this.getOpponents().length;
+   }
+
+   /**
     * Render the GUI
     */
    render(){
@@ -150,6 +206,7 @@ export default class Game {
       // Filter text
       txt = this.fancyNumbers( txt );
       txt = this.fancyHeaders( txt );
+      txt = this.fancyStats( txt );
 
       // Indent output
       const regex = /\n/gi;
@@ -157,33 +214,11 @@ export default class Game {
    }
 
    /**
-    * Centre text at Game.colWidth
-    */
-   _centre( txt ){
-      const w = Game.colWidth;
-      const txtLen = txt.length;
-
-      if( txtLen > w ) return txt;
-
-      const diff = w - txtLen;
-      const padLeft = Math.floor( diff/2 );
-      txt = " ".repeat( padLeft ) + txt;
-      return this._pad( txt );
-   }
-
-   /**
-    * Pad text to Game.colWidth
-    */
-   _pad( txt ){
-      return txt.padEnd( Game.colWidth );
-   }
-
-   /**
     * Replace `(1) First`, `(2) Second`, `(12) Twelfth` etc.
     * with `❶  First`, `❷  Second`, `⓬  Twelfth` etc.
     * Note: extra space added as it looks clearer in the terminal
     */
-   fancyNumbers(str){
+   fancyNumbers( str ){
 
       const nums = [
          '❶','❷','❸','❹','❺',
@@ -194,7 +229,7 @@ export default class Game {
 
       return str.replace(
          /(\(([\d]+)\))/g,
-         (match, p1, p2) => {
+         ( match, p1, p2 ) => {
             const symbol = nums[parseInt( p2 )];
             return Game.menuIndexFormat( symbol ) + ' ';
          }
@@ -202,12 +237,33 @@ export default class Game {
    }
 
    /**
-    * Replace `[[Header]]` with `Game.moduleTitleFormat('Header')`
+    * Replace `[[Header]]` with `Game.moduleTitleFormat( 'Header' )`
     */
    fancyHeaders( str ){
       return str.replace(
          /\[\[(.*)\]\]/g,
-         (match, p1) => Game.moduleTitleFormat( ` ${ p1 } ` )
+         ( match, p1 ) => Game.moduleTitleFormat( ` ${ p1 } ` )
+      );
+   }
+
+   /**
+    * Replace `[Stat]` with `Game.lowKeyFormat( '[Stat]' )`
+    */
+   fancyStats( str ){
+      return str.replace(
+         /\{(.*)\}/g,
+         ( match, p1 ) => Game.lowKeyFormat( `[${ p1 }]` )
+      );
+   }
+
+   /**
+    * Input prompt, called by AbstractModule
+    */
+   prompt( msg ){
+      msg = this.fancyStats( msg );
+
+      return this.promptObj(
+         Game.promptFormat( `${ Game.indent }${ msg } ܀ ` )
       );
    }
 
@@ -215,6 +271,9 @@ export default class Game {
     * Quit the app
     */
    quit(){
+      // Ask for current reference
+      this.player.setAttr( 'reference', this.prompt( 'Current ref / ENTER to skip') );
+
       this._( this.snapshots.export( 'autosave' ));
       this._();
       process.exit();

@@ -19,6 +19,7 @@ export default class AbstractCollectionModule extends AbstractModule {
          removeMenu: 'Remove item',
          removeAllMenu: 'Remove all',
          addPrompt: 'Add item',
+         addAnotherPrompt: 'Add item / ENTER to finish',
          removePrompt: 'Remove item #',
          notFound: 'Item #$ not found',
          added: '$ was added',
@@ -31,8 +32,13 @@ export default class AbstractCollectionModule extends AbstractModule {
     * Prompt user for item to add to collection
     */
    add( itemsAdded = [] ){
-      const item = this.prompt( this.captions.addPrompt );
 
+      // If adding multiple items, use addAnother prompty
+      const item = this.prompt(
+         itemsAdded.length ?
+            this.captions.addAnotherPrompt :
+            this.captions.addPrompt
+      );
 
       if( '' !== item) {
          this.state.a.push( item );
@@ -43,9 +49,6 @@ export default class AbstractCollectionModule extends AbstractModule {
             return this.add( itemsAdded );
          }
       }
-
-      // Autoclose menu item
-      this.close();
 
       // Status caption
       const caption = itemsAdded.length <= 3 ?
@@ -68,9 +71,6 @@ export default class AbstractCollectionModule extends AbstractModule {
 
       // Remove item
       this.state.a = this.arrayPluck( this.state.a, n - 1 );
-
-      // Autoclose menu item
-      this.close();
 
       return this.removed( item );
    }

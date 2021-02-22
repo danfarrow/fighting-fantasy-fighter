@@ -34,29 +34,30 @@ export default class Menu {
          out += `(${i}) ${opt.title}\n`;
 
       return config.reduce( reducer, `[[Menu]]\n` )
-         + `${Game.menuIndexFormat('Ⓠ')}  Quit (with autosave)`;
+         + `${ Game.menuIndexFormat( 'Ⓠ' ) }  Quit (with autosave)`;
    }
 
    /**
     * Get and process user menu choice
     */
    getCommand(){
-      const input = this.prompt( `Choose a menu item ܀ ` );
+      const input = this.prompt( 'Choose a menu item ܀ ' ).trim().toLowerCase();
 
       // `q` to quit
-      if( "q" === input.trim().toLowerCase() ){
+      if( 'q' === input ){
          this.game.quit();
          return;
       }
 
+      // Pressing ENTER in submenu chooses first entry
       // Check for valid menu choice
-      const i = parseInt(input)-1;
+      const i = '' !== input.trim() ? parseInt( input )-1 : 0;
       const menuItem = this.config[i];
 
       // Menu item has an action
       if( menuItem && menuItem.action) return( menuItem.action() );
 
       // Menu item doesn't exist
-      return `Invalid choice`;
+      return 'Invalid choice';
    }
 };

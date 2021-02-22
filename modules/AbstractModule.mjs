@@ -1,7 +1,5 @@
 "use strict";
 
-// https://www.npmjs.com/package/prompt-sync
-import Prompt from 'prompt-sync';
 import Game from './Game.mjs';
 
 /**
@@ -15,13 +13,9 @@ export default class AbstractModule {
       this.moduleName = this.constructor.name;
 
       this.game = game;
-      this.indent = Game.indent
 
       // State is used to export & import snapshots
       this.state = {}
-
-      // Prompt is used to get user input
-      this.promptObj = new Prompt({ sigint: true });
 
       // Is this module currently displaying?
       this.visible = false;
@@ -35,12 +29,10 @@ export default class AbstractModule {
    }
 
    /**
-    * Indented prompt
+    * Prompt proxy
     */
-   prompt(msg){
-      return this.promptObj(
-         Game.promptFormat( `${ this.indent }${ msg } ܀ ` )
-      );
+   prompt( msg ){
+      return this.game.prompt( msg );
    }
 
    /**
@@ -58,7 +50,7 @@ export default class AbstractModule {
     */
    numberPrompt( msg = `Please enter a number`, n = null ){
 
-      const input = this.prompt( `${msg}` );
+      const input = this.prompt( msg );
 
       // Empty input cancels
       if( '' === input ) return;
@@ -157,13 +149,6 @@ export default class AbstractModule {
    }
 
    /**
-    * Event hook to be overwritten by child classes
-    */
-   postRestore(){
-
-   }
-
-   /**
     * Title to be displayed in menu for this module
     */
    getMenuTitle(){
@@ -172,15 +157,14 @@ export default class AbstractModule {
 
    /**
     * Get menu config when module menu is closed
-    *
-    * Placeholder methods for subclasses to overwrite
     */
    getMenuClosed(){
 
       // If menu open only has one entry then use that instead
       const menuOpen = this.getMenuOpen();
+
       if( menuOpen.length === 2 ){
-         return [ menuOpen[1] ];
+         return [ menuOpen[ 1 ]];
       }
 
       // For subclasses that have an array of items
@@ -188,7 +172,7 @@ export default class AbstractModule {
       const a = this.state.a;
 
       const itemCount = a && a.length ?
-         Game.lowKeyFormat(` [${ a.length }]`)
+         ` {${ a.length }}`
          : '';
 
       return [
@@ -223,8 +207,8 @@ export default class AbstractModule {
    /**
     * Helper function to pluck item i from array
     */
-   arrayPluck(array, index) {
-      return array.slice(0, index)
-         .concat(array.slice(index + 1));
+   arrayPluck( array, index ) {
+      return array.slice( 0, index )
+         .concat( array.slice( index + 1 ));
    }
 }

@@ -24,26 +24,4 @@ export default class Notes extends AbstractCollectionModule {
          removeAll: 'All notes removed'
       }
    }
-
-   // getMenuOpen(){
-   //    const opts = [
-   //       {
-   //          title: `${this.moduleName} ${ Game.menuIndexFormat(`×`) }`,
-   //          action: ()=>this.close()
-   //       },
-   //       {
-   //          title: 'Add note',
-   //          action: ()=>this.add()
-   //       }
-   //    ];
-
-   //    if( this.state.a.length ){
-   //       opts.push({
-   //          title: 'Remove note',
-   //          action: ()=>this.remove()
-   //       });
-   //    }
-
-   //    return opts;
-   // }
 }
