@@ -4,9 +4,7 @@ __node command line companion app for playing Fighting Fantasy books__
 
 ### [Try it online here!](https://repl.it/@danfarrow/fighting-fantasy-fighter)
 
-While reading [Fighting Fantasy](https://www.fightingfantasy.com/) books with my son I became slightly obsessed with making a cli app to keep track of our playthroughs.
-
-I also wanted to build a node CLI app with OOP & native JavaScript modules. This has been the perfect project to explore those concepts.
+I introduced my son to [Fighting Fantasy](https://www.fightingfantasy.com/) gamebooks and then became slightly obsessed with making a node cli app, using oop & native javascript modules, to keep track of our playthroughs.
 
 ## Features
 
