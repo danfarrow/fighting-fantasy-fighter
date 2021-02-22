@@ -8,6 +8,7 @@ import AbstractModule from './AbstractModule.mjs';
  * i.e. Inventory, Notes, Snapshots
  */
 export default class AbstractCollectionModule extends AbstractModule {
+
    constructor( game ){
       super( game );
       this.state.a = [];
