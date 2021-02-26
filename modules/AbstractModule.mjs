@@ -191,7 +191,9 @@ export default class AbstractModule {
    getMenuOpen(){
       return [
          {
-            title: `${ Game.highKeyFormat( this.getMenuTitle() ) } ${ Game.menuIndexFormat( `×` ) }`,
+            title: Game.highKeyFormat( this.getMenuTitle() ) +
+               Game.menuIndexFormat( ' × ' ) +
+               Game.lowKeyFormat( 'ENTER to close' ),
             action: ()=>this.close()
          }
       ]
