@@ -1,6 +1,6 @@
 "use strict";
 
-import AbstractModule from "./AbstractModule.mjs";
+import AbstractModule from './AbstractModule.mjs';
 import Character from './Character.mjs';
 
 /**
@@ -12,7 +12,6 @@ export default class Encounters extends AbstractModule {
       this.dice = game.dice;
       this.player = game.player;
       this.useLuckConfig;
-      //this.state.history = [];
       this.alwaysVisible = true;
    }
 
@@ -25,21 +24,14 @@ export default class Encounters extends AbstractModule {
       const player = this.player;
 
       // Create opponent
-      // @todo This func should be removed from Player
       const opponent = this.addOpponent();
-      const opponentName = opponent.getName();
 
       // Log entry for start of encounter
       const title =
          `${ player.getName() } [${ player.getAttributesShort() }]\n`
-         + `${ opponentName } [${ opponent.getAttributesShort() }]`;
+         + `${ opponent.getName() } [${ opponent.getAttributesShort() }]`;
 
-      // this.state.log = {
-      //    title: title,
-      //    roundCount: 0
-      // }
-
-      return `Fight with ${ opponentName } started!`;
+      return `Fight with ${ opponent.getName() } started!`;
    }
 
    /**
@@ -60,24 +52,16 @@ export default class Encounters extends AbstractModule {
     */
    attack( opponent ){
 
-      // Increment roundCount in log
- //     this.state.log.roundCount++;
-
       const player = this.player;
-      const playerName = player.getName();
-      const opponentName = opponent.getName();
 
-      // @todo Calculate other opponents attacks
       const otherOpponents = this.game.getOpponents()
          .filter(( i ) => i !== opponent );
 
       // Get results of attack round
-      const {
-         playerAttack,
-         opponentAttack,
-         loser,
-         output
-      } = player.attack( opponent, otherOpponents );
+      const { loser, output } = player.attack(
+         opponent,
+         otherOpponents
+      );
 
       if( loser === player ){
 
@@ -92,9 +76,8 @@ export default class Encounters extends AbstractModule {
 
          // Player died
          if( player.isDead() ){
-            // Remove `injured` message
-            output.pop();
-            return `${ output.join( `\n` ) }\n${ this.lose( opponent ) }`;
+            this.end( opponent );
+            return output.join( `\n` );
          }
 
       } else if( loser === opponent ){
@@ -102,7 +85,7 @@ export default class Encounters extends AbstractModule {
          // Set 'use luck' functions
          // @todo Move to player
          this.useLuckConfig = {
-            title: "Use luck to increase damage",
+            title: 'Use luck to increase damage',
             opponent: opponent,
             lucky: ()=> opponent.damage( 2 ),
             unlucky: ()=> opponent.heal( 1 )
@@ -110,9 +93,8 @@ export default class Encounters extends AbstractModule {
 
          // Opponent died
          if( opponent.isDead() ) {
-            // Remove `injured` message
-            output.pop();
-            return `${ output.join( `\n` ) }\n${ this.win( opponent ) }`;
+            this.end( opponent );
+            return output.join( `\n` );
          }
 
       } else {
@@ -148,85 +130,24 @@ export default class Encounters extends AbstractModule {
       }
 
       // @todo Check for player / opponent death
-      if( this.player.isDead() ){
-         return this.lose( opponent );
-      }
-
-      if( opponent.isDead() ){
-         return this.win( opponent );
+      if( this.player.isDead() || opponent.isDead() ){
+         return this.end( opponent );
       }
 
       return output.join( `\n` );
    }
 
    /**
-    * Player escaped the encounter
-    */
-   escape( opponent ){
-      const outcome = `Escaped from ${ opponent.getName() }`
-      return this.end( opponent, outcome );
-   }
-
-   /**
-    * Player won the encounter
-    */
-   win( opponent ){
-      // const r = this.state.log.roundCount;
-      const outcome =
-         `${ opponent.getName() } killed`;
-
-         // in ` +
-         // `${ r } round${ r > 1 ? 's' : '' }`;
-
-      return this.end( opponent, outcome );
-   }
-
-   /**
-    * Player lost the encounter
-    */
-   lose( opponent ){
-      // const r = this.state.log.roundCount;
-      const outcome =
-         `${ this.player.getName() } killed`;
-
-         //  in ` +
-         // `${ r } round${ r > 1 ? 's' : '' }`;
-
-      return this.end( opponent, outcome );
-   }
-
-   /**
     * End the current encounter, close menu, clean up
     */
-   end( opponent, outcome ){
-
+   end( opponent ){
       this.player.onEncounterEnd( opponent );
       opponent.onEncounterEnd();
 
-      // Update log
-    //  this.state.log.outcome = outcome;
-    //  this.state.history.push( this.state.log );
-
-      // Reset all state except history
-    //  this.state = { history: this.state.history }
-      this.state = {};
-      this.close();
-
-      return outcome;
-   }
-
-   /**
-    * Return string of encounter history
-    */
-   history(){
-      // index, title, outcome
-      const out = [];
-
-      for( const encounter of this.state.history ){
-         out.push( `${ encounter.title }\n${ encounter.outcome }` );
+      // Close if no more opponents
+      if( !this.game.getOpponentCount() ){
+         this.close();
       }
-
-      return out.join( `\n\n` );
    }
 
    /**
@@ -274,17 +195,6 @@ export default class Encounters extends AbstractModule {
                action: ()=> this.start()
             }
          )
-
-         // If there is an encounter history
-         // add `Encounter history` menu item
-         // if( this.state.history.length ){
-         //    menu.push(
-         //       {
-         //          title: `Fight history`,
-         //          action: ()=> this.history()
-         //       }
-         //    );
-         // }
 
       } else {
 

@@ -134,9 +134,8 @@ export default class Game {
     * Register a new opponent
     */
    registerOpponent( opponent ){
-      // Push character module as module #2, after player
-      const player = this.modules.shift();
-      this.modules = [ player, opponent, ...this.modules ];
+      // Opponent menu entry pushed to bottom of menu
+      this.modules.push( opponent );
    }
 
    /**

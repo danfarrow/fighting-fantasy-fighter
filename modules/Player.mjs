@@ -34,8 +34,6 @@ export default class Player extends Character {
       this.format = Game.playerFormat;
       this.headerFormat = Game.playerHeaderFormat;
 
-      // this.opponents = [];
-      // this.state.opponentStates = [];
    }
 
    /**
@@ -44,63 +42,62 @@ export default class Player extends Character {
     */
    attack( opponent, otherOpponents = [] ){
 
-      // Instant Death rule: if player throws a double, opponent dies
-      const instantDeathRule = true;
-
       // Get attack strengths
       const {
          total: playerAttack,
-         isDouble,
-         status: playerStatus,
-         ascii: playerAscii
+         isDouble
       } = this.getAttackStrength();
 
       const {
-         total: opponentAttack,
-         status: opponentStatus,
-         ascii: opponentAscii
+         total: opponentAttack
       } = opponent.getAttackStrength();
 
-      // Damage amount
+
+      const output = [];
       const damage = 2;
 
-      // Add attacks to output
-      const output = [ playerStatus, opponentStatus ];
+      // Resolve clash
+      let winner, loser;
 
-      // Check for Instant Death
+      // Instant Death rule: if player throws a double, opponent dies
+      const instantDeathRule = true;
       if( isDouble && instantDeathRule ){
 
-         // Show special ascii dice
-         this.status.push( Game.instantDeathFormat( playerAscii ) );
-
          // Replace attack strengths output
-         output.pop();
-         output.pop();
-         output.push(
-            'INSTANT DEATH',
-            opponent.damage( opponent.getAttr( 'stamina' ))
-         );
+         opponent.damage( opponent.getAttr( 'stamina' ));
+         output.push( 'INSTANT DEATH' );
+         winner = this;
+         loser = opponent;
 
-         return { output, loser: opponent }
-      }
+      } else if( playerAttack === opponentAttack ){
 
-      // Check for miss, or calculate loser
-      let loser;
-
-      if( playerAttack === opponentAttack ){
-
+         // Miss
+         winner = null;
          loser = null;
 
       } else {
 
          loser = playerAttack < opponentAttack ? this : opponent;
-         output.push( loser.damage( damage ));
+         winner = playerAttack > opponentAttack ? this : opponent;
 
       }
 
-      // Show colour formatted dice rolls
-      this.status.push( this.format( playerAscii ));
-      opponent.status.push( opponent.format( opponentAscii ));
+      if( loser ){
+         output.push( loser.damage( damage, winner ) );
+      }
+
+      // Get other opponent attacks
+      for( const opponent of otherOpponents ){
+         const { total } = opponent.getAttackStrength();
+
+         if( total > playerAttack ){
+            output.push( this.damage( damage, opponent ));
+         } else {
+            output.push(
+               `${ this.getName() } parried ${ opponent.getName() }`
+            );
+         }
+      }
 
       return { playerAttack, opponentAttack, loser, output }
    }

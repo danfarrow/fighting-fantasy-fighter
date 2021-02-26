@@ -192,8 +192,8 @@ export default class Character extends AbstractModule {
       out.push( skillString );
       out.push( staminaString );
 
-      // Add any extra status messages & clear status
-      out.push( ...this.status );
+      // Format & add extra status messages, then reset status
+      out.push( ...this.status.map( s => this.format( s )));
       this.status = [];
 
       return out.join(`\n`);
@@ -227,17 +227,21 @@ export default class Character extends AbstractModule {
       const skill = this.getAttr( 'skill' );
       const name = this.getAttr( 'name' );
 
+      // Show colour formatted dice rolls in status
+      this.status.push( ascii );
+
       // Compose attack status line
       const attackStrength = total + skill;
-      const status = `${ name } attack: ${ attackStrength }`;
-      return { total: attackStrength, isDouble, status, ascii };
+      const caption = `${ name } attack: ${ attackStrength }`;
+      return { total: attackStrength, isDouble, caption };
    }
 
    /**
-    * Take damage: reduce stamina
+    * Take damage. Reduce stamina by `amt`
     */
-   damage( amt ){
+   damage( amt, opponent = null ){
 
+      const  attribution = opponent ?  ` by ${ opponent.getName() }` : ``;
       this.setAttr( 'stamina', this.getAttr( 'stamina' ) - amt );
 
       // Change output format to show damage
@@ -246,19 +250,16 @@ export default class Character extends AbstractModule {
       this.format = Game.characterDamageFormat
       this.headerFormat = Game.characterDamageHeaderFormat;
 
-      const n = this.getAttr( 'name');
+      // Add post-render functions to revert to original formats
+      this.postRenderQueue.push( ()=> this.format = origFormat );
+      this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat );
 
       if( this.isAlive() ){
-
-         // Add post-render functions to revert to original formats
-         this.postRenderQueue.push( ()=> this.format = origFormat );
-         this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat );
-
-         return `${ n } wounded [${ amt }]!`;
+         return `${ this.getName() } wounded${ attribution }`;
       }
 
       // Character is dead
-      return `${ n } killed!`
+      return `${ this.getName() } killed${ attribution }`;
    }
 
    /**

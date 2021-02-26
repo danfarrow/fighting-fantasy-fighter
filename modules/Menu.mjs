@@ -30,11 +30,12 @@ export default class Menu {
       this.config = config;
 
       // Render array of menu entries
-      const reducer = (out, opt, i) =>
+      const reducer = ( out, opt, i ) =>
          out += `(${i}) ${opt.title}\n`;
 
-      return config.reduce( reducer, `[[Menu]]\n` )
-         + `${ Game.menuIndexFormat( 'Ⓠ' ) }  Quit (with autosave)`;
+      return config.reduce( reducer, `[[Menu]]\n` ) +
+         `${ Game.menuIndexFormat( 'Ⓠ' ) }  Quit ` +
+         Game.lowKeyFormat( '(with autosave)' );
    }
 
    /**
