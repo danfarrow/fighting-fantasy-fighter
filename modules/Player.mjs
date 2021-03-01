@@ -11,7 +11,7 @@ export default class Player extends Character {
    constructor( game ){
 
       // Randomise attributes
-      const skillFunc = ()=> game.dice.rollQuiet( 2 ) + 6;
+      const skillFunc = ()=> game.dice.rollQuiet( 1 ) + 6;
       const stamFunc = ()=> game.dice.rollQuiet( 2 ) + 12
       const luckFunc = ()=> game.dice.rollQuiet( 1 ) + 6;
 
@@ -41,6 +41,7 @@ export default class Player extends Character {
     * defend against other opponents
     */
    attack( opponent, otherOpponents = [] ){
+      const instantDeathRule = false;
 
       // Get attack strengths
       const {
@@ -60,7 +61,6 @@ export default class Player extends Character {
       let winner, loser;
 
       // Instant Death rule: if player throws a double, opponent dies
-      const instantDeathRule = true;
       if( isDouble && instantDeathRule ){
 
          // Replace attack strengths output
