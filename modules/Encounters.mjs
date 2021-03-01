@@ -31,6 +31,9 @@ export default class Encounters extends AbstractModule {
          `${ player.getName() } [${ player.getAttributesShort() }]\n`
          + `${ opponent.getName() } [${ opponent.getAttributesShort() }]`;
 
+      // Open this module
+      this.open();
+
       return `Fight with ${ opponent.getName() } started!`;
    }
 

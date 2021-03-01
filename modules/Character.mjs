@@ -37,7 +37,6 @@ export default class Character extends AbstractModule {
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.opponentFormat;
       this.headerFormat = Game.opponentHeaderFormat;
-
    }
 
    /**
@@ -196,6 +195,10 @@ export default class Character extends AbstractModule {
       out.push( ...this.status.map( s => this.format( s )));
       this.status = [];
 
+      // Reset initial formats
+      this.format = Game.opponentFormat;
+      this.headerFormat = Game.opponentHeaderFormat;
+
       return out.join(`\n`);
    }
 
@@ -245,14 +248,8 @@ export default class Character extends AbstractModule {
       this.setAttr( 'stamina', this.getAttr( 'stamina' ) - amt );
 
       // Change output format to show damage
-      const origFormat = this.format;
-      const origHeaderFormat = this.headerFormat;
       this.format = Game.characterDamageFormat
       this.headerFormat = Game.characterDamageHeaderFormat;
-
-      // Add post-render functions to revert to original formats
-      this.postRenderQueue.push( ()=> this.format = origFormat );
-      this.postRenderQueue.push( ()=> this.headerFormat = origHeaderFormat );
 
       if( this.isAlive() ){
          return `${ this.getName() } wounded${ attribution }`;

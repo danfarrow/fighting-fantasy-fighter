@@ -150,6 +150,20 @@ export default class Player extends Character {
    }
 
    /**
+    * Reset output formats
+    */
+   getRender(){
+
+      const out = super.getRender();
+
+      // Formatting for title, attribute bars, dice ASCII
+      this.format = Game.playerFormat;
+      this.headerFormat = Game.playerHeaderFormat;
+
+      return out;
+   }
+
+   /**
     * Return ascii string of lucky / unlucky
     */
    getLuckAscii( lucky ){
