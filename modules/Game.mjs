@@ -170,10 +170,12 @@ export default class Game {
    }
 
    /**
-    * Return number of current opponents
+    * Return number of current living opponents
     */
    getOpponentCount(){
-      return this.getOpponents().length;
+      return this.getOpponents()
+         .filter( o => o.isAlive() )
+         .length;
    }
 
    /**

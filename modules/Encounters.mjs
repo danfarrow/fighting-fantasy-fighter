@@ -144,8 +144,8 @@ export default class Encounters extends AbstractModule {
       this.player.onEncounterEnd( opponent );
       opponent.onEncounterEnd();
 
-      // Close if no more opponents
-      if( !this.game.getOpponentCount() ){
+      // Close if no more living opponents
+      if( 0 === this.game.getOpponentCount() ){
          this.close();
       }
    }
