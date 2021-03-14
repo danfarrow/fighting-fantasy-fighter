@@ -6,30 +6,17 @@ import Game from './Game.mjs';
 /**
  * Character class
  */
-export default class Character extends AbstractModule {
+export default class AbstractCharacter extends AbstractModule {
 
-   constructor( game, nameOrState, skill, stamina ){
+   constructor( game, state ){
 
       super( game );
 
-      if( typeof nameOrState === 'object' ){
-         // Restore character from supplied state obj
-         this.state = { ...nameOrState };
-      } else {
-         this.state.attributes = {};
-         this.setAttr( 'name', nameOrState || this.prompt( 'Opponent name' ));
-         this.setAttr( 'skill', skill !== undefined ? skill : this.numberPrompt( 'Opponent skill' ));
-         this.setAttr( 'stamina', stamina !== undefined ? stamina : this.numberPrompt( 'Opponent stamina' ));
-      }
+      this.generate( state );
+      this.storeInitialValues();
 
-      // Character info always displays
+      // Character info always displays while alive
       this.alwaysVisible = true;
-
-      // Store initial values of skill, stamina
-      this.state.initialValues = {
-         skill: this.getAttr( 'skill' ),
-         stamina: this.getAttr( 'stamina' )
-      }
 
       // Status buffer for transient messages
       this.status = [];
@@ -37,6 +24,34 @@ export default class Character extends AbstractModule {
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.opponentFormat;
       this.headerFormat = Game.opponentHeaderFormat;
+   }
+
+   /**
+    * Roll new character or use supplied state
+    */
+   generate( state ){
+
+      if( typeof state === 'object' ){
+         this.state = state;
+      }
+
+      if( !this.state.attributes ){
+
+         this.state.attributes = {};
+         this.setAttr( 'name', this.prompt( `${ this.moduleName } name` ));
+         this.setAttr( 'skill', this.numberPrompt( `${ this.moduleName } skill` ));
+         this.setAttr( 'stamina', this.numberPrompt( `${ this.moduleName } stamina` ));
+      }
+   }
+
+   /**
+    * Store initial attribute values
+    */
+   storeInitialValues(){
+      // Store initial values of skill, stamina, etc.
+      this.state.initialValues = {
+         ...this.state.attributes
+      }
    }
 
    /**
@@ -75,7 +90,7 @@ export default class Character extends AbstractModule {
     * @todo Accept relative amounts i.e. `+1`, `-1`
     */
    setAttr( attr, value ){
-      if( '' === value ) return `Cancelled`;
+      if( '' === value ) return 'Cancelled';
 
       attr = attr.toLowerCase();
 
@@ -93,15 +108,16 @@ export default class Character extends AbstractModule {
    /**
     * Add a new attribute
     */
-   addAttr( attr ){
+   addAttr( attr, value ){
 
       if( this.state.attributes[ attr ] ){
          return 'Attribute already exists';
       }
 
-      const value = this.numberPrompt( `Set ${ attr.toLowerCase() }` );
-
-      return this.setAttr( attr, value );
+      return this.setAttr(
+         attr,
+         value || this.numberPrompt( `Set ${ attr.toLowerCase() }` )
+      );
    }
 
    /**
@@ -111,6 +127,7 @@ export default class Character extends AbstractModule {
 
       const caption = `Set ${ this.getAttrCaption( attr ) }`;
 
+      // 'name' should be the only non-numeric attribute
       return 'name' === attr ?
          this.prompt( caption )
          : this.numberPrompt( caption, this.getAttr( attr ));
@@ -137,14 +154,15 @@ export default class Character extends AbstractModule {
     * Title to be displayed in menu for this module
     */
    getMenuTitle(){
-      return this.getAttr( 'name' );
+      return this.getName();
    }
 
    /**
     * Populate menu in open state
     */
    getMenuOpen(){
-      // Build dynamic menu to set stats values
+
+      // Build dynamic menu for setting attribute values
       const menu = [];
 
       for( const attr in this.state.attributes ) {
@@ -156,6 +174,7 @@ export default class Character extends AbstractModule {
          );
       }
 
+      // Add 'Add attribute' menu entry
       menu.push(
          {
             title: 'Add attribute',
@@ -170,7 +189,12 @@ export default class Character extends AbstractModule {
    }
 
    /**
-    * Return full text for character attributes
+    * Return character dashboard text e.g.
+    *
+    *    Anonymous Player
+    *    ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ ⚔ [11]
+    *    ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ [22]
+    *
     */
    getRender(){
       const skill = this.getAttr( 'skill' );
@@ -228,7 +252,7 @@ export default class Character extends AbstractModule {
    getAttackStrength( ){
       const { total, isDouble, ascii } = this.game.dice.roll();
       const skill = this.getAttr( 'skill' );
-      const name = this.getAttr( 'name' );
+      const name = this.getName();
 
       // Show colour formatted dice rolls in status
       this.status.push( ascii );
@@ -244,7 +268,7 @@ export default class Character extends AbstractModule {
     */
    damage( amt, opponent = null ){
 
-      const  attribution = opponent ?  ` by ${ opponent.getName() }` : ``;
+      const  attribution = opponent ?  `by ${ opponent.getName() }` : ``;
       this.setAttr( 'stamina', this.getAttr( 'stamina' ) - amt );
 
       // Change output format to show damage
@@ -252,11 +276,11 @@ export default class Character extends AbstractModule {
       this.headerFormat = Game.characterDamageHeaderFormat;
 
       if( this.isAlive() ){
-         return `${ this.getName() } wounded${ attribution }`;
+         return `${ this.getName() } wounded ${ attribution }`;
       }
 
       // Character is dead
-      return `${ this.getName() } killed${ attribution }`;
+      return `${ this.getName() } defeated ${ attribution }`;
    }
 
    /**

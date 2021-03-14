@@ -1,39 +1,44 @@
 "use strict";
 
-import Character from './Character.mjs';
+import AbstractCharacter from './AbstractCharacter.mjs';
 import Game from './Game.mjs';
 
 /**
  * Player class
  */
-export default class Player extends Character {
+export default class Player extends AbstractCharacter {
 
    constructor( game ){
+      super( game );
 
-      // Randomise attributes
-      const skillFunc = ()=> game.dice.rollQuiet( 1 ) + 6;
-      const stamFunc = ()=> game.dice.rollQuiet( 2 ) + 12
-      const luckFunc = ()=> game.dice.rollQuiet( 1 ) + 6;
-
-      const skill = skillFunc();
-      const stamina = stamFunc();
-      const luck = luckFunc();
-
-      super( game, 'Anonymous Player', skill, stamina );
-
-      // Add extra player attributes
-      const a = this.state.attributes = {
-         ...this.state.attributes,
-         luck: luck
-      }
-
-      // Add initial value for luck
-      this.state.initialValues.luck = luck;
+      this.setAttr( 'name', 'Anonymous Player' );
 
       // Formatting for title, attribute bars, dice ASCII
       this.format = Game.playerFormat;
       this.headerFormat = Game.playerHeaderFormat;
+   }
 
+   /**
+    * Randomly generate player
+    */
+   generate( state ){
+
+      if( !this.state.attributes ){
+         this.state.attributes = {};
+      }
+
+      // Randomise attributes
+      const skillFunc = ()=> this.game.dice.rollQuiet( 1 ) + 6;
+      const stamFunc = ()=> this.game.dice.rollQuiet( 2 ) + 12
+      const luckFunc = ()=> this.game.dice.rollQuiet( 1 ) + 6;
+
+      // Leave name blank so it doesn't
+      // get stored in initialValues
+      this.setAttr( 'name' );
+
+      this.setAttr( 'skill', skillFunc());
+      this.setAttr( 'stamina', stamFunc());
+      this.addAttr( 'luck', luckFunc());
    }
 
    /**
@@ -109,11 +114,12 @@ export default class Player extends Character {
 
       attr = attr.toLowerCase();
 
-      // Check for attribute in state, whilst respecting zero values
-      if( !Object.keys(this.state.attributes).includes( attr ) ) return;
+      // Check if attribute exists in state
+      // whilst respecting zero values
+      if( !Object.keys( this.state.attributes ).includes( attr ) ) return;
 
-      // `!this.state.initialValues` little bugfix :(
-      if( !this.state.initialValues || !this.state.initialValues[attr] ){
+      // `!this.state.initialValues` little bugfix
+      if( !this.state.initialValues || !this.state.initialValues[ attr ] ){
          return super.getAttrCaption( attr, capitalise );
       }
 
@@ -199,7 +205,7 @@ export default class Player extends Character {
 
       if( this.getAttr('luck') > 0 ){
 
-         const luck = this.getAttr('luck');
+         const luck = this.getAttr( 'luck' );
          const luckCount = `{${ luck }}`;
 
          menu.push(

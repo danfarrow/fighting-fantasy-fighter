@@ -6,7 +6,7 @@ import Dice from './Dice.mjs';
 import Menu from './Menu.mjs';
 import Notes from './Notes.mjs';
 import Player from './Player.mjs';
-import Character from './Character.mjs';
+import Opponent from './Opponent.mjs';
 import Inventory from './Inventory.mjs';
 import Snapshots from './Snapshots.mjs';
 import Encounters from './Encounters.mjs';
@@ -147,7 +147,7 @@ export default class Game {
       statesArray = statesArray.reverse();
 
       for( const state of statesArray ){
-         this.registerOpponent( new Character( this, state ));
+         this.registerOpponent( new Opponent( this, state ));
       }
    }
 
@@ -158,8 +158,7 @@ export default class Game {
       return this.modules.reduce(
          ( opponents, module ) => {
             if(
-               module instanceof Character &&
-               module !== this.player
+               module instanceof Opponent
             ){
                opponents.push( module )
             }

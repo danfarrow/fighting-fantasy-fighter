@@ -1,7 +1,7 @@
 "use strict";
 
 import AbstractModule from './AbstractModule.mjs';
-import Character from './Character.mjs';
+import Opponent from './Opponent.mjs';
 
 /**
  * Encounter class
@@ -42,7 +42,7 @@ export default class Encounters extends AbstractModule {
     */
    addOpponent(){
 
-      const opponent = new Character( this.game );
+      const opponent = new Opponent( this.game );
 
       // Register opponent with game
       this.game.registerOpponent( opponent );
