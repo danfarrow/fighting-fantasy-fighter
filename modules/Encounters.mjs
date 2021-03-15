@@ -212,7 +212,7 @@ export default class Encounters extends AbstractModule {
             );
          }
 
-         // Add `End encounter` & `Use luck...`
+         // Add 'Add opponent'
          menu.push(
             {
                title: `Add opponent`,
@@ -220,11 +220,21 @@ export default class Encounters extends AbstractModule {
                   const opponent = this.addOpponent();
                   return `${ opponent.getName() } added`;
                }
-            },
-            // {
-            //    title: `Escape fight`,
-            //    action: ()=>this.escape( opponent )
-            // }
+            }
+         );
+
+         // Add 'Escape encounter'
+         menu.push(
+            {
+               title: `Escape encounter`,
+               action: ()=> {
+                  for( const opponent of opponents ){
+                     this.end( opponent );
+                  }
+
+                  return 'Encounter ended';
+               }
+            }
          );
 
          if( this.useLuckConfig ){
