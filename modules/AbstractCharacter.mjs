@@ -198,6 +198,14 @@ export default class AbstractCharacter extends AbstractModule {
     */
    getRender(){
       const skill = this.getAttr( 'skill' );
+      const skillInit = this.state.initialValues.skill;
+      const skillLost = Math.max( skillInit - skill, 0 );
+
+      const skillString =
+         this.format( '⚔ '.repeat( skill )) +
+         '· '.repeat( skillLost ) +
+         `{${ skill }}`;
+
       const stamina = this.getAttr( 'stamina' );
       const stamInit = this.state.initialValues.stamina;
       const stamLost = Math.max( stamInit - stamina, 0 );
@@ -206,10 +214,6 @@ export default class AbstractCharacter extends AbstractModule {
          this.format( '♥ '.repeat( stamina )) +
          '♡ '.repeat( stamLost ) +
          `{${ stamina }}`;
-
-      const skillString =
-         this.format( '⚔ '.repeat( skill )) +
-         `{${ skill }}`;
 
       const out = [ this.headerFormat( ` ${ this.getName() } ` ) ];
       out.push( skillString );
