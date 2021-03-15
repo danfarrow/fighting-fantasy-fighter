@@ -192,14 +192,10 @@ export default class Player extends AbstractCharacter {
          Game.characterDamageFormat( txt );
    }
 
-   getMenuOpen(){
-      return this.getMenu( super.getMenuOpen() );
-   }
-
    /**
     * Add player specific items to menu
     */
-   getMenu(){
+   getMenuOpen(){
 
       const menu = super.getMenuOpen();
 
