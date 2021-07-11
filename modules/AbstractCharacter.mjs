@@ -86,8 +86,6 @@ export default class AbstractCharacter extends AbstractModule {
     *
     * string attr Name of attribute
     * int/string value Type-checked value
-    *
-    * @todo Accept relative amounts i.e. `+1`, `-1`
     */
    setAttr( attr, value ){
       if( '' === value ) return 'Cancelled';

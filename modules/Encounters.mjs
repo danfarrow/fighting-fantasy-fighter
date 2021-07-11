@@ -69,7 +69,6 @@ export default class Encounters extends AbstractModule {
       if( loser === player ){
 
          // Set 'use luck' functions
-         // @todo Move to player
          this.useLuckConfig = {
             title: 'Use luck to reduce injury',
             opponent: opponent,
@@ -86,7 +85,6 @@ export default class Encounters extends AbstractModule {
       } else if( loser === opponent ){
 
          // Set 'use luck' functions
-         // @todo Move to player
          this.useLuckConfig = {
             title: 'Use luck to increase damage',
             opponent: opponent,
@@ -118,7 +116,6 @@ export default class Encounters extends AbstractModule {
       if( !this.useLuckConfig ) return;
 
       // Copy & delete useLuckConfig
-      // @todo Use `delete`?
       const luckConfig = this.useLuckConfig;
       this.useLuckConfig = null;
 
@@ -132,7 +129,7 @@ export default class Encounters extends AbstractModule {
          output.push( luckConfig.unlucky() );
       }
 
-      // @todo Check for player / opponent death
+      // Check for player / opponent death
       if( this.player.isDead() || opponent.isDead() ){
          return this.end( opponent );
       }
